@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}
+FlaskDings
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-md-3 bg-secondary">
+      <h3>Scenes</h3>
+      {% for key, value in config.scenes.items() %}
+      <div>
+        <a href="/mididings/scenes/{{ key }}">{{ key }}:{{value[0] }}</a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-9 bg-dark">
+      <h2>{{config.current_scene}}.{{config.current_subscene}} / {{ config.scenes[config.current_scene][0] }} </h2>
+      <h2 class="text-center">{{ config.scenes[config.current_scene][0] }}</h2>
+      {% for value in config.scenes[config.current_scene][1] %}
+      <div class="text-center">
+        {% if loop.index == config.current_subscene %}
+        <a class="btn btn-success" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
+        {% else %}
+        <a class="btn btn-secondary" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-3 bg-dark">
+      <!--               
+        <div><a class="btn btn-primary" href="/mididings/query">Query</a></div>
+        <input type="range" id="volume" name="volume" min="0" max="100"> 
+      -->
+    </div>
+
+    <div class="col-md-9 bg-secondary">
+      <table class="table text-center table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Scene</th>
+            <th scope="col">Subscene</th>
+            <th scope="col">Panic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="btn btn-primary"><a href="/mididings/prev_scene">Prev</a></div>
+              <div class="btn btn-primary"><a href="/mididings/next_scene">Next</a></div>
+            </td>
+            <td>
+              <div class="btn btn-primary"><a href="/mididings/prev_subscene">Prev</a></div>
+              <div class="btn btn-primary"><a href="/mididings/next_subscene">Next</a></div>
+            </td>
+            <td>
+              <div class="btn btn-danger"><a href="/mididings/panic">!</a></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+</div>
+
+{% endblock body %}
