@@ -1,0 +1,7 @@
+{
+   "server" : 
+   {
+      "control_port" :56418,
+      "listen_port" : 56419
+   }
+}
