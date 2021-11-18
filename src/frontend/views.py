@@ -6,7 +6,6 @@ ui_blueprint = Blueprint('ui_blueprint', __name__,
                             url_prefix='/ui')
 
 
-
 @ui_blueprint.route("/")
 def index():
     if current_app.config['livedings'].scenes:

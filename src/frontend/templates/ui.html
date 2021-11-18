@@ -9,12 +9,11 @@ FlaskDings
 <div class="container">
 
   <div class="row">
-
     <div class="col-md-3 bg-secondary">
-      <h3>Scenes</h3>
+      <h3>Scenes {{ config.refresh }}</h3>
       {% for key, value in config.scenes.items() %}
       <div>
-        <a href="/mididings/scenes/{{ key }}">{{ key }}:{{value[0] }}</a>
+        <a href="/api/mididings/scenes/{{ key }}">{{ key }}:{{value[0] }}</a>
       </div>
       {% endfor %}
     </div>
@@ -25,9 +24,9 @@ FlaskDings
       {% for value in config.scenes[config.current_scene][1] %}
       <div class="text-center">
         {% if loop.index == config.current_subscene %}
-        <a class="btn btn-success" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
+        <a class="btn btn-success" href="/api/mididings/subscenes/{{ loop.index }}">{{value}}</a>
         {% else %}
-        <a class="btn btn-secondary" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
+        <a class="btn btn-secondary" href="/api/mididings/subscenes/{{ loop.index }}">{{value}}</a>
         {% endif %}
       </div>
       {% endfor %}
@@ -56,15 +55,15 @@ FlaskDings
         <tbody>
           <tr>
             <td>
-              <div class="btn btn-primary"><a href="/mididings/prev_scene">Prev</a></div>
-              <div class="btn btn-primary"><a href="/mididings/next_scene">Next</a></div>
+              <div class="btn btn-primary"><a href="/api/mididings/prev_scene">Prev</a></div>
+              <div class="btn btn-primary"><a href="/api/mididings/next_scene">Next</a></div>
             </td>
             <td>
-              <div class="btn btn-primary"><a href="/mididings/prev_subscene">Prev</a></div>
-              <div class="btn btn-primary"><a href="/mididings/next_subscene">Next</a></div>
+              <div class="btn btn-primary"><a href="/api/mididings/prev_subscene">Prev</a></div>
+              <div class="btn btn-primary"><a href="/api/mididings/next_subscene">Next</a></div>
             </td>
             <td>
-              <div class="btn btn-danger"><a href="/mididings/panic">!</a></div>
+              <div class="btn btn-danger"><a href="/api/mididings/panic">!</a></div>
             </td>
           </tr>
         </tbody>
