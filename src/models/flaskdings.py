@@ -1,7 +1,7 @@
 from mididings.live.osc_control import LiveOSC
 
 '''
-This class is the equivalent of the mididings.live.livedings.LiveDings class with more functionnalities
+This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
 
 

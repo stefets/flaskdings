@@ -6,9 +6,11 @@ import json
 
 import liblo
 from models.flaskdings import FlaskDings
+from frontend.views import ui_blueprint
 
-from flask import Flask, redirect, url_for, render_template
-from werkzeug.exceptions import HTTPException
+from flask import Flask, redirect, url_for, render_template, jsonify
+from werkzeug.exceptions import HTTPException 
+from werkzeug.utils import import_string
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -18,60 +20,85 @@ filename = os.path.join(app.static_folder, 'config.json')
 with open(filename) as FILE:
     configuration = json.load(FILE)
 
-flaskdings = None
+livedings = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    flaskdings = FlaskDings(configuration["osc_server"])
+    livedings = FlaskDings(configuration["osc_server"])
 
+# BLUEPRINT
+app.config['livedings'] = livedings
+app.register_blueprint(ui_blueprint)
+#
 
 @app.route("/")
 def index():
-    return render_template('index.html', config=flaskdings)
 
+    return render_template('api.html')
 
 @app.route("/mididings/next_scene")
 def next_scene():
-    flaskdings.next_scene()
-    return redirect(url_for('index'))
+    livedings.next_scene()
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/mididings/prev_scene")
 def prev_scene():
-    flaskdings.prev_scene()
-    return redirect(url_for('index'))
+    livedings.prev_scene()
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/mididings/next_subscene")
 def next_subscene():
-    flaskdings.next_subscene()
-    return redirect(url_for('index'))
+    livedings.next_subscene()
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/mididings/prev_subscene")
 def prev_subscene():
-    flaskdings.prev_subscene()
-    return redirect(url_for('index'))
+    livedings.prev_subscene()
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/mididings/panic")
 def panic():
-    flaskdings.panic()
+    livedings.panic()
     return ('', 204)
 
 
 @app.route("/mididings/scenes/<int:value>")
 def switch_scene(value):
-    flaskdings.switch_scene(value)
-    return redirect(url_for('index'))
+    livedings.switch_scene(value)
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/mididings/subscenes/<int:value>")
 def switch_subscene(value):
-    flaskdings.switch_subscene(value)
-    return redirect(url_for('index'))
+    livedings.switch_subscene(value)
+    return redirect(url_for('ui_blueprint.index'))
 
+@app.route("/help")
+def help():
+    """
+    API Home
+    """
+    routes = []
+    for rule in app.url_map.iter_rules():
+        try:
+            if rule.endpoint != 'static':
+                if hasattr(app.view_functions[rule.endpoint], 'import_name'):
+                    import_name = app.view_functions[rule.endpoint].import_name
+                    obj = import_string(import_name)
+                    routes.append({rule.rule: "%s\n%s" % (",".join(list(rule.methods)), obj.__doc__)})
+                else:
+                    routes.append({rule.rule: app.view_functions[rule.endpoint].__doc__})
+        except Exception as exc:
+            routes.append({rule.rule: 
+                           "(%s) INVALID ROUTE DEFINITION!!!" % rule.endpoint})
+            route_info = "%s => %s" % (rule.rule, rule.endpoint)
+            app.logger.error("Invalid route: %s" % route_info, exc_info=True)
+            # func_list[rule.rule] = obj.__doc__
+
+    return jsonify(code=200, data=routes)
 # Errors
-
-
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON instead of HTML for HTTP errors."""
