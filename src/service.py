@@ -3,10 +3,8 @@
 
 import os
 import json
-import atexit
 
-import liblo
-from osc.flaskdings import FlaskDings
+from osc.server import MididingsContext
 from frontend.views import ui_blueprint
 
 from flask import Flask, redirect, url_for, render_template, jsonify
@@ -23,13 +21,14 @@ with open(filename) as FILE:
 
 livedings = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = FlaskDings(configuration["osc_server"])
+    livedings = MididingsContext(configuration["osc_server"])
 
 
 # BLUEPRINT
 app.config['livedings'] = livedings
 app.register_blueprint(ui_blueprint)
 #
+
 
 @app.route("/")
 @app.route("/api")
@@ -40,8 +39,7 @@ def index():
 @app.route("/api/mididings/next_scene")
 def next_scene():
     livedings.next_scene()
-    return ('', 204)
-#    return redirect(url_for('ui_blueprint.index'))
+    return redirect(url_for('ui_blueprint.index'))
 
 
 @app.route("/api/mididings/prev_scene")
@@ -105,9 +103,14 @@ def help():
             # func_list[rule.rule] = obj.__doc__
 
     return jsonify(code=200, data=routes)
+
+
+@app.route("/api/ping")
+def ping():
+    return '', 204
+
+
 # Errors
-
-
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON instead of HTML for HTTP errors."""

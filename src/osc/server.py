@@ -2,6 +2,10 @@ from mididings.live.osc_control import LiveOSC
 
 import liblo
 
+'''
+OSC Server 
+'''
+
 
 class OscServer(LiveOSC):
     def __init__(self, dings, control_port, listen_port):
@@ -15,12 +19,14 @@ class OscServer(LiveOSC):
 '''
 This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
-class FlaskDings(object):
+
+
+class MididingsContext(object):
     def __init__(self, options):
 
         self.osc = OscServer(
             self, options["control_port"], options["listen_port"])
-        
+
         self.osc.start()
 
         self.current_scene = -1

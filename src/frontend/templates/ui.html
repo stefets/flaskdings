@@ -1,16 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}
-FlaskDings
-{% endblock %}
-
 {% block body %}
 
 <div class="container">
 
   <div class="row">
     <div class="col-md-3 bg-secondary">
-      <h3>Scenes {{ config.refresh }}</h3>
+      <h3>Scenes</h3>
       {% for key, value in config.scenes.items() %}
       <div>
         <a href="/api/mididings/scenes/{{ key }}">{{ key }}:{{value[0] }}</a>
