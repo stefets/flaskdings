@@ -3,11 +3,12 @@
 
 import os
 import json
+import jinja2
 
 from osc.server import MididingsContext
 from frontend.views import ui_blueprint
 
-from flask import Flask, redirect, url_for, render_template, jsonify
+from flask import Flask, redirect, url_for, render_template, jsonify, request, make_response
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import import_string
 
@@ -38,44 +39,50 @@ def index():
 
 @app.route("/api/mididings/next_scene")
 def next_scene():
-    livedings.next_scene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.next_scene)
 
 
 @app.route("/api/mididings/prev_scene")
 def prev_scene():
-    livedings.prev_scene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.prev_scene)
 
 
 @app.route("/api/mididings/next_subscene")
 def next_subscene():
-    livedings.next_subscene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.next_subscene)
 
 
 @app.route("/api/mididings/prev_subscene")
 def prev_subscene():
-    livedings.prev_subscene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.prev_subscene)
 
 
 @app.route("/api/mididings/panic")
 def panic():
-    livedings.panic()
-    return ('', 204)
+    return on_api_request(livedings.panic)
 
 
 @app.route("/api/mididings/scenes/<int:value>")
 def switch_scene(value):
-    livedings.switch_scene(value)
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.switch_scene, value)
 
 
 @app.route("/api/mididings/subscenes/<int:value>")
 def switch_subscene(value):
-    livedings.switch_subscene(value)
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.switch_subscene, value)
+
+
+'''
+    Execute the request in a hybrid way - API only or FRONTEND
+    Default is API mode and 204 is returned 
+    If the request.args.view parameters is defined, we redirect to this view
+'''
+
+
+def on_api_request(livedings_action, action_value=None):
+    livedings_action(action_value) if action_value else livedings_action()
+    view = request.args.get('view')
+    return make_response('', 204) if not view else redirect(url_for(view))
 
 
 @app.route("/api/help")
@@ -110,7 +117,23 @@ def ping():
     return '', 204
 
 
-# Errors
+'''
+Jinja2 Filters
+This filter serve the API to determine if we render a view
+'''
+
+
+def inject_endpoint(param):
+    return param + request.endpoint
+
+
+jinja2.filters.FILTERS['inject_endpoint'] = inject_endpoint
+
+'''
+Errors
+'''
+
+
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON instead of HTML for HTTP errors."""
