@@ -9,3 +9,4 @@ A Flask API for MIDIDINGS
 * http://dsacre.github.io/mididings/doc/
 * https://groups.google.com/g/mididings
 
+<img src="/doc/flaskdings.png" />
