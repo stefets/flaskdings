@@ -61,6 +61,10 @@ def prev_subscene():
 def panic():
     return on_api_request(livedings.panic)
 
+@app.route("/api/mididings/quit")
+def quit():
+    return on_api_request(livedings.quit)
+
 
 @app.route("/api/mididings/scenes/<int:value>")
 def switch_scene(value):

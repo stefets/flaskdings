@@ -11,6 +11,6 @@ def index():
     if current_app.config['livedings'].scenes:
         # We are here after an OSC process, wait a little before rendering
         sleep(0.0625)
-        return render_template('ui.html', config=current_app.config['livedings'], parameter="?view=")
+        return render_template('ui.html', context=current_app.config['livedings'], parameter="?view=")
     else:
         return render_template('nodings.html')

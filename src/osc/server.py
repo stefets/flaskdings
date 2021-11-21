@@ -11,6 +11,12 @@ class OscServer(LiveOSC):
     def __init__(self, dings, control_port, listen_port):
         super().__init__(dings, control_port, listen_port)
 
+    
+    ''' Quit mididings '''
+    def quit(self):
+        self.send(self.control_port, '/mididings/quit')
+
+
     @liblo.make_method('/frontend/refresh', '')
     def refresh(self, path, args):
         self.dings.notify_frontend()
@@ -54,6 +60,9 @@ class MididingsContext(object):
 
     def panic(self):
         self.osc.panic()
+
+    def quit(self):
+        self.osc.quit()
 
     def switch_scene(self, value):
         self.osc.switch_scene(value)
