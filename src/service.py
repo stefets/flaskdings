@@ -3,13 +3,13 @@
 
 import os
 import json
+import jinja2
 
-import liblo
-from models.flaskdings import FlaskDings
+from osc.server import MididingsContext
 from frontend.views import ui_blueprint
 
-from flask import Flask, redirect, url_for, render_template, jsonify
-from werkzeug.exceptions import HTTPException 
+from flask import Flask, redirect, url_for, render_template, jsonify, request, make_response
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import import_string
 
 app = Flask(__name__)
@@ -22,60 +22,74 @@ with open(filename) as FILE:
 
 livedings = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = FlaskDings(configuration["osc_server"])
+    livedings = MididingsContext(configuration["osc_server"])
+
 
 # BLUEPRINT
 app.config['livedings'] = livedings
 app.register_blueprint(ui_blueprint)
 #
 
-@app.route("/")
-def index():
 
+@app.route("/")
+@app.route("/api")
+def index():
     return render_template('api.html')
 
-@app.route("/mididings/next_scene")
+
+@app.route("/api/mididings/next_scene")
 def next_scene():
-    livedings.next_scene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.next_scene)
 
 
-@app.route("/mididings/prev_scene")
+@app.route("/api/mididings/prev_scene")
 def prev_scene():
-    livedings.prev_scene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.prev_scene)
 
 
-@app.route("/mididings/next_subscene")
+@app.route("/api/mididings/next_subscene")
 def next_subscene():
-    livedings.next_subscene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.next_subscene)
 
 
-@app.route("/mididings/prev_subscene")
+@app.route("/api/mididings/prev_subscene")
 def prev_subscene():
-    livedings.prev_subscene()
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.prev_subscene)
 
 
-@app.route("/mididings/panic")
+@app.route("/api/mididings/panic")
 def panic():
-    livedings.panic()
-    return ('', 204)
+    return on_api_request(livedings.panic)
+
+@app.route("/api/mididings/quit")
+def quit():
+    return on_api_request(livedings.quit)
 
 
-@app.route("/mididings/scenes/<int:value>")
+@app.route("/api/mididings/scenes/<int:value>")
 def switch_scene(value):
-    livedings.switch_scene(value)
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.switch_scene, value)
 
 
-@app.route("/mididings/subscenes/<int:value>")
+@app.route("/api/mididings/subscenes/<int:value>")
 def switch_subscene(value):
-    livedings.switch_subscene(value)
-    return redirect(url_for('ui_blueprint.index'))
+    return on_api_request(livedings.switch_subscene, value)
 
-@app.route("/help")
+
+'''
+    Execute the request in a hybrid way - API only or FRONTEND
+    Default is API mode and 204 is returned 
+    If the request.args.view parameters is defined, we redirect to this view
+'''
+
+
+def on_api_request(livedings_action, action_value=None):
+    livedings_action(action_value) if action_value else livedings_action()
+    view = request.args.get('view')
+    return make_response('', 204) if not view else redirect(url_for(view))
+
+
+@app.route("/api/help")
 def help():
     """
     API Home
@@ -87,18 +101,43 @@ def help():
                 if hasattr(app.view_functions[rule.endpoint], 'import_name'):
                     import_name = app.view_functions[rule.endpoint].import_name
                     obj = import_string(import_name)
-                    routes.append({rule.rule: "%s\n%s" % (",".join(list(rule.methods)), obj.__doc__)})
+                    routes.append({rule.rule: "%s\n%s" %
+                                  (",".join(list(rule.methods)), obj.__doc__)})
                 else:
-                    routes.append({rule.rule: app.view_functions[rule.endpoint].__doc__})
+                    routes.append(
+                        {rule.rule: app.view_functions[rule.endpoint].__doc__})
         except Exception as exc:
-            routes.append({rule.rule: 
+            routes.append({rule.rule:
                            "(%s) INVALID ROUTE DEFINITION!!!" % rule.endpoint})
             route_info = "%s => %s" % (rule.rule, rule.endpoint)
             app.logger.error("Invalid route: %s" % route_info, exc_info=True)
             # func_list[rule.rule] = obj.__doc__
 
     return jsonify(code=200, data=routes)
-# Errors
+
+
+@app.route("/api/ping")
+def ping():
+    return '', 204
+
+
+'''
+Jinja2 Filters
+This filter serve the API to determine if we render a view
+'''
+
+
+def inject_endpoint(param):
+    return param + request.endpoint
+
+
+jinja2.filters.FILTERS['inject_endpoint'] = inject_endpoint
+
+'''
+Errors
+'''
+
+
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON instead of HTML for HTTP errors."""

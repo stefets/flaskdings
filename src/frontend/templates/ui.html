@@ -1,77 +1,130 @@
 {% extends 'base.html' %}
 
-{% block title %}
-FlaskDings
-{% endblock %}
-
 {% block body %}
-
 <div class="container">
 
-  <div class="row">
+  <!-- Header -->
+  <div class="row mb-1">
+    <div class="col-md-4 bg-secondary text-center">
+      <h3>Scene : {{context.current_scene}}.{{context.current_subscene}} </h3>
+    </div>
+    <div class="col-md-8 bg-dark">
+      <!-- Fil d'ariane -->
+      <h3 class="bg-dark">
+        / {{ context.scenes[context.current_scene][0] }}
+        {% if context.scenes[context.current_scene][1]|length > 0 %}
+        / {{ context.scenes[context.current_scene][1][context.current_subscene-1]}}
+        {% endif %}
+      </h3>
+    </div>
+  </div>
 
-    <div class="col-md-3 bg-secondary">
-      <h3>Scenes</h3>
-      {% for key, value in config.scenes.items() %}
-      <div>
-        <a href="/mididings/scenes/{{ key }}">{{ key }}:{{value[0] }}</a>
+  <!-- Body -->
+  <div class="row mb-1">
+
+    <!-- Liste de scenes -->
+    <div class="col-md-4 bg-secondary">
+
+      {% for scenes in context.scenes.items() | batch(2) %}
+
+      <div class="row mt-1 mb-1">
+        {%- for scene in scenes %}
+        <div class="col-md-6">
+          {% if scene[0] == context.current_scene %}
+          {% set class="btn-success" %}
+          {% else %}
+          {% set class="btn-dark" %}
+          {% endif %}
+          <a class="btn btn-block {{ class }}" href="/api/mididings/scenes/{{ scene[0] }}{{ parameter | inject_endpoint }}">{{
+            scene[1][0]}}</a>
+        </div>
+        {% endfor %}
       </div>
+
       {% endfor %}
+
     </div>
 
-    <div class="col-md-9 bg-dark">
-      <h2>{{config.current_scene}}.{{config.current_subscene}} / {{ config.scenes[config.current_scene][0] }} </h2>
-      <h2 class="text-center">{{ config.scenes[config.current_scene][0] }}</h2>
-      {% for value in config.scenes[config.current_scene][1] %}
-      <div class="text-center">
-        {% if loop.index == config.current_subscene %}
-        <a class="btn btn-success" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
-        {% else %}
-        <a class="btn btn-secondary" href="/mididings/subscenes/{{ loop.index }}">{{value}}</a>
-        {% endif %}
+    <!-- Sous-scenes de la scene courante -->
+    <div class="col-md-8 bg-dark">
+
+      {% set iterator = {'count': 0} %}
+
+      {% for subscenes in context.scenes[context.current_scene][1] | batch(4) %}
+
+      <div class="row mt-1 mb-1">
+
+        {%- for subscene in subscenes %}
+
+        {% if iterator.update({'count': iterator.count + 1}) %}{% endif %}
+        <div class="col-md-3 text-center">
+          {% if iterator.count == context.current_subscene %}
+          {% set class="btn-success" %}
+          {% else %}
+          {% set class="btn-secondary" %}
+          {% endif %}
+          <a class="btn btn-block {{ class }}"
+            href="/api/mididings/subscenes/{{ iterator.count }}{{ parameter | inject_endpoint }}">{{subscene}}</a>
+        </div>
+        <!-- Subscene  -->
+        {%- endfor %}
+
       </div>
+      <!-- Subscene batch -->
       {% endfor %}
+
     </div>
 
   </div>
 
+  <!-- Footer -->
   <div class="row">
 
-    <div class="col-md-3 bg-dark">
+    <div class="col-md-4 bg-secondary">
       <!--               
         <div><a class="btn btn-primary" href="/mididings/query">Query</a></div>
         <input type="range" id="volume" name="volume" min="0" max="100"> 
       -->
+      <br />
+      <div class="row mt-1 mb-1">
+        <div class="col-md-6">
+          <div class="btn btn-block btn-dark"><a href="/api/mididings/quit{{ parameter | inject_endpoint }}">Quit</a></div>
+        </div>
+        <div class="col-md-6">
+          <div class="btn btn-block btn-danger"><a href="/api/mididings/panic">Panic</a></div>
+        </div>
+      </div>
     </div>
 
-    <div class="col-md-9 bg-secondary">
+    <div class="col-md-8 bg-dark">
       <table class="table text-center table-sm">
         <thead>
           <tr>
             <th scope="col">Scene</th>
             <th scope="col">Subscene</th>
-            <th scope="col">Panic</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>
-              <div class="btn btn-primary"><a href="/mididings/prev_scene">Prev</a></div>
-              <div class="btn btn-primary"><a href="/mididings/next_scene">Next</a></div>
+              <div class="btn btn-primary"><a href="/api/mididings/prev_scene{{ parameter | inject_endpoint }}">Prev</a>
+              </div>
+              <div class="btn btn-primary"><a href="/api/mididings/next_scene{{ parameter | inject_endpoint }}">Next</a>
+              </div>
             </td>
             <td>
-              <div class="btn btn-primary"><a href="/mididings/prev_subscene">Prev</a></div>
-              <div class="btn btn-primary"><a href="/mididings/next_subscene">Next</a></div>
+              <div class="btn btn-primary"><a
+                  href="/api/mididings/prev_subscene{{ parameter | inject_endpoint }}">Prev</a></div>
+              <div class="btn btn-primary"><a
+                  href="/api/mididings/next_subscene{{ parameter | inject_endpoint }}">Next</a></div>
             </td>
-            <td>
-              <div class="btn btn-danger"><a href="/mididings/panic">!</a></div>
-            </td>
+
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  
+
 </div>
 
 {% endblock body %}
