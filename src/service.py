@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from flask_socketio import SocketIO
+from frontend.views import ui_blueprint
+from osc.server import MididingsContext
 import os
 import json
 import jinja2
+from time import sleep
 
-from osc.server import MididingsContext
-from frontend.views import ui_blueprint
-
+''' Flask '''
 from flask import Flask, redirect, url_for, render_template, jsonify, request, make_response
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import import_string
 
+''' Mididings across OSC '''
+
+''' Websockets '''
+
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+socketio = SocketIO(app)
+
 
 # Configuration
 filename = os.path.join(app.static_folder, 'config.json')
@@ -37,63 +45,54 @@ def index():
     return render_template('api.html')
 
 
-@app.route("/api/mididings/next_scene")
+'''
+    Websockets
+'''
+
+@socketio.event
 def next_scene():
-    return on_api_request(livedings.next_scene)
+    update_ui(livedings.next_scene)
 
 
-@app.route("/api/mididings/prev_scene")
+@socketio.event
 def prev_scene():
-    return on_api_request(livedings.prev_scene)
+    update_ui(livedings.prev_scene)
 
 
-@app.route("/api/mididings/next_subscene")
-def next_subscene():
-    return on_api_request(livedings.next_subscene)
-
-
-@app.route("/api/mididings/prev_subscene")
+@socketio.event
 def prev_subscene():
-    return on_api_request(livedings.prev_subscene)
+    update_ui(livedings.prev_subscene)
+
+@socketio.event
+def next_subscene():
+    update_ui(livedings.next_subscene)
 
 
-@app.route("/api/mididings/panic")
-def panic():
-    return on_api_request(livedings.panic)
-
-
-@app.route("/api/mididings/quit")
-def quit():
-    return on_api_request(livedings.quit)
-
-
-@app.route("/api/mididings/restart")
-def restart():
-    return on_api_request(livedings.restart)
-
-
-@app.route("/api/mididings/scenes/<int:value>")
-def switch_scene(value):
-    return on_api_request(livedings.switch_scene, value)
-
-
-@app.route("/api/mididings/subscenes/<int:value>")
-def switch_subscene(value):
-    return on_api_request(livedings.switch_subscene, value)
+def update_ui(action, action_value=None):
+    livedings()  # Set the ready flag to False
+    action(action_value) if action_value else action()
+    timeout = 0
+    while not livedings.ready:
+        # We are here after an OSC process, wait a little before rendering
+        sleep(0.0625)
+        timeout += 1
+        if timeout % 32 == 0:
+            break
+    socketio.emit('mididings.update', {
+                  'current_scene': livedings.current_scene,
+                  'current_subscene': livedings.current_subscene,
+                  'current_scene_name': livedings.scenes[livedings.current_scene][0],
+                  'current_subscene_name': livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1] if livedings.scenes[livedings.current_scene][1] else "..."})
 
 
 '''
-    Execute the request in a hybrid way - API only or FRONTEND
-    Default is API mode and 204 is returned 
-    If the request.args.view parameters is defined, we redirect to this view
+
+
+    if livedings.scenes[livedings.current_scene][1]|length > 0
+    livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1]
+
+
 '''
-
-
-def on_api_request(livedings_action, action_value=None):
-    livedings() # Set the ready flag to False
-    livedings_action(action_value) if action_value else livedings_action()
-    view = request.args.get('view')
-    return make_response('', 204) if not view else redirect(url_for(view))
 
 
 @app.route("/api/help")
@@ -161,4 +160,4 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)

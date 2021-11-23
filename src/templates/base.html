@@ -40,6 +40,40 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
+        integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
+        crossorigin="anonymous"></script>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+            var socket = io()
+
+            socket.on('mididings.update', function (context) {
+                $('#current_scene').text(context.current_scene);
+                $('#current_scene_name').text(context.current_scene_name);
+                $('#current_subscene').text(context.current_subscene);
+                $('#current_subscene_name').text(context.current_subscene_name);
+            });
+
+            $('form#next_scene').submit(function(event) {
+                socket.emit('next_scene');
+                return false;
+            });
+            $('form#prev_scene').submit(function(event) {
+                socket.emit('prev_scene');
+                return false;
+            });
+            $('form#next_subscene').submit(function(event) {
+                socket.emit('next_subscene');
+                return false;
+            });
+            $('form#prev_subscene').submit(function(event) {
+                socket.emit('prev_subscene');
+                return false;
+            });               
+
+        });
+    </script>
 
 </body>
 

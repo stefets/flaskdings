@@ -6,15 +6,14 @@
   <!-- Header -->
   <div class="row mb-1">
     <div class="col-md-4 bg-secondary text-center">
-      <h3>Scene : {{context.current_scene}}.{{context.current_subscene}} </h3>
-    </div>
+      <h3>
+        Scene : <span id="current_scene"></span>.<span id="current_subscene"></span>
+      </h3>
+      </div>
     <div class="col-md-8 bg-dark">
       <!-- Fil d'ariane -->
       <h3 class="bg-dark">
-        / {{ context.scenes[context.current_scene][0] }}
-        {% if context.scenes[context.current_scene][1]|length > 0 %}
-        / {{ context.scenes[context.current_scene][1][context.current_subscene-1]}}
-        {% endif %}
+        <span id="current_scene_name"></span> / <span id="current_subscene_name"></span>
       </h3>
     </div>
   </div>
@@ -89,7 +88,8 @@
       <br />
       <div class="row mt-1 mb-1">
         <div class="col-md-4">
-          <div class="btn btn-block btn-primary"><a href="/api/mididings/restart{{ parameter | inject_endpoint }}">Restart</a>
+          <div class="btn btn-block btn-primary"><a
+              href="/api/mididings/restart{{ parameter | inject_endpoint }}">Restart</a>
           </div>
         </div>
         <div class="col-md-4">
@@ -113,16 +113,20 @@
         <tbody>
           <tr>
             <td>
-              <div class="btn btn-primary"><a href="/api/mididings/prev_scene{{ parameter | inject_endpoint }}">Prev</a>
-              </div>
-              <div class="btn btn-primary"><a href="/api/mididings/next_scene{{ parameter | inject_endpoint }}">Next</a>
-              </div>
+                <form id="prev_scene" method="POST" action='#'>
+                  <input class="btn btn-primary" type="submit" value="Prev scene">
+                </form>
+                <form id="next_scene" method="POST" action='#'>
+                  <input class="btn btn-primary" type="submit" value="Next scene">
+                </form>
             </td>
             <td>
-              <div class="btn btn-primary"><a
-                  href="/api/mididings/prev_subscene{{ parameter | inject_endpoint }}">Prev</a></div>
-              <div class="btn btn-primary"><a
-                  href="/api/mididings/next_subscene{{ parameter | inject_endpoint }}">Next</a></div>
+              <form id="prev_subscene" method="POST" action='#'>
+                <input class="btn btn-primary" type="submit" value="Prev subscene">
+              </form>
+              <form id="next_subscene" method="POST" action='#'>
+                <input class="btn btn-primary" type="submit" value="Next subscene">
+              </form>
             </td>
           </tr>
         </tbody>
