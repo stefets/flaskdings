@@ -35,7 +35,8 @@
           {% else %}
           {% set class="btn-dark" %}
           {% endif %}
-          <a class="btn btn-block {{ class }}" href="/api/mididings/scenes/{{ scene[0] }}{{ parameter | inject_endpoint }}">{{
+          <a class="btn btn-block {{ class }}"
+            href="/api/mididings/scenes/{{ scene[0] }}{{ parameter | inject_endpoint }}">{{
             scene[1][0]}}</a>
         </div>
         {% endfor %}
@@ -87,11 +88,16 @@
       -->
       <br />
       <div class="row mt-1 mb-1">
-        <div class="col-md-6">
-          <div class="btn btn-block btn-dark"><a href="/api/mididings/quit{{ parameter | inject_endpoint }}">Quit</a></div>
+        <div class="col-md-4">
+          <div class="btn btn-block btn-primary"><a href="/api/mididings/restart{{ parameter | inject_endpoint }}">Restart</a>
+          </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="btn btn-block btn-danger"><a href="/api/mididings/panic">Panic</a></div>
+        </div>
+        <div class="col-md-4">
+          <div class="btn btn-block btn-dark"><a href="/api/mididings/quit{{ parameter | inject_endpoint }}">Quit</a>
+          </div>
         </div>
       </div>
     </div>
@@ -118,13 +124,11 @@
               <div class="btn btn-primary"><a
                   href="/api/mididings/next_subscene{{ parameter | inject_endpoint }}">Next</a></div>
             </td>
-
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-
 </div>
 
 {% endblock body %}
