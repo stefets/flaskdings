@@ -61,9 +61,15 @@ def prev_subscene():
 def panic():
     return on_api_request(livedings.panic)
 
+
 @app.route("/api/mididings/quit")
 def quit():
     return on_api_request(livedings.quit)
+
+
+@app.route("/api/mididings/restart")
+def restart():
+    return on_api_request(livedings.restart)
 
 
 @app.route("/api/mididings/scenes/<int:value>")
@@ -84,6 +90,7 @@ def switch_subscene(value):
 
 
 def on_api_request(livedings_action, action_value=None):
+    livedings() # Set the ready flag to False
     livedings_action(action_value) if action_value else livedings_action()
     view = request.args.get('view')
     return make_response('', 204) if not view else redirect(url_for(view))

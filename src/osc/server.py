@@ -11,15 +11,15 @@ class OscServer(LiveOSC):
     def __init__(self, dings, control_port, listen_port):
         super().__init__(dings, control_port, listen_port)
 
-    
     ''' Quit mididings '''
+
     def quit(self):
         self.send(self.control_port, '/mididings/quit')
 
+    ''' Restart mididings '''
 
-    @liblo.make_method('/frontend/refresh', '')
-    def refresh(self, path, args):
-        self.dings.notify_frontend()
+    def restart(self):
+        self.send(self.control_port, '/mididings/restart')
 
 
 '''
@@ -39,12 +39,12 @@ class MididingsContext(object):
         self.current_subscene = -1
         self.data_offset = -1
         self.scenes = {}
-        self.refresh = False
+        self.ready = False
 
         self.osc.query()
 
-    def notify_frontend(self):
-        self.refresh = True
+    def __call__(self):
+        self.ready = False
 
     def next_scene(self):
         self.osc.next_scene()
@@ -61,7 +61,11 @@ class MididingsContext(object):
     def panic(self):
         self.osc.panic()
 
+    def restart(self):
+        self.osc.restart()
+
     def quit(self):
+        self.scenes = {}
         self.osc.quit()
 
     def switch_scene(self, value):
@@ -83,3 +87,4 @@ class MididingsContext(object):
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
+        self.ready = True # This is the last OSC operation so we are truly ready
