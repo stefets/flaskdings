@@ -5,7 +5,7 @@
 
   <!-- Header -->
   <div class="row mb-1">
-    <div class="col-md-4 bg-secondary text-center">
+    <div class="col-md-4 bg-secondary">
       <h3>
         Scene : <span id="current_scene"></span>.<span id="current_subscene"></span>
       </h3>
@@ -18,73 +18,18 @@
     </div>
   </div>
 
-  <!-- Body -->
+  <!-- Content -->
   <div class="row mb-1">
-
     <!-- Liste de scenes -->
-    <div class="col-md-4 bg-secondary">
-
-      {% for scenes in context.scenes.items() | batch(2) %}
-
-      <div class="row mt-1 mb-1">
-        {%- for scene in scenes %}
-        <div class="col-md-6">
-          {% if scene[0] == context.current_scene %}
-          {% set class="btn-success" %}
-          {% else %}
-          {% set class="btn-dark" %}
-          {% endif %}
-          <a class="btn btn-block {{ class }}"
-            href="/api/mididings/scenes/{{ scene[0] }}{{ parameter | inject_endpoint }}">{{
-            scene[1][0]}}</a>
-        </div>
-        {% endfor %}
-      </div>
-
-      {% endfor %}
-
-    </div>
-
+    <div id="scenes" class="col-md-4 bg-secondary"> </div>
     <!-- Sous-scenes de la scene courante -->
-    <div class="col-md-8 bg-dark">
-
-      {% set iterator = {'count': 0} %}
-
-      {% for subscenes in context.scenes[context.current_scene][1] | batch(4) %}
-
-      <div class="row mt-1 mb-1">
-
-        {%- for subscene in subscenes %}
-
-        {% if iterator.update({'count': iterator.count + 1}) %}{% endif %}
-        <div class="col-md-3 text-center">
-          {% if iterator.count == context.current_subscene %}
-          {% set class="btn-success" %}
-          {% else %}
-          {% set class="btn-secondary" %}
-          {% endif %}
-          <a class="btn btn-block {{ class }}"
-            href="/api/mididings/subscenes/{{ iterator.count }}{{ parameter | inject_endpoint }}">{{subscene}}</a>
-        </div>
-        <!-- Subscene  -->
-        {%- endfor %}
-
-      </div>
-      <!-- Subscene batch -->
-      {% endfor %}
-
-    </div>
-
+    <div id="subscenes" class="col-md-8 bg-dark"> </div>
   </div>
 
   <!-- Footer -->
   <div class="row">
 
     <div class="col-md-4 bg-secondary">
-      <!--               
-        <div><a class="btn btn-primary" href="/mididings/query">Query</a></div>
-        <input type="range" id="volume" name="volume" min="0" max="100"> 
-      -->
       <br />
       <div class="row mt-1 mb-1">
         <div class="col-md-4">

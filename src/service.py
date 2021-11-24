@@ -14,8 +14,6 @@ from flask import Flask, redirect, url_for, render_template, jsonify, request, m
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import import_string
 
-''' Mididings across OSC '''
-
 ''' Websockets '''
 
 app = Flask(__name__)
@@ -51,13 +49,13 @@ def index():
 
 
 @socketio.event
-def switch_scene(id):
-    update_ui(livedings.switch_scene, id)
+def switch_scene(data):
+    update_ui(livedings.switch_scene, int(data['id']))
 
 
 @socketio.event
-def switch_subscene(id):
-    update_ui(livedings.switch_subscene, id)
+def switch_subscene(data):
+    update_ui(livedings.switch_subscene, int(data['id']))
 
 
 @socketio.event
@@ -98,8 +96,7 @@ def update_ui(action, action_value=None):
     socketio.emit('mididings.update', {
                   'current_scene': livedings.current_scene,
                   'current_subscene': livedings.current_subscene,
-                  'current_scene_name': livedings.scenes[livedings.current_scene][0],
-                  'current_subscene_name': livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1] if livedings.scenes[livedings.current_scene][1] else "..."})
+                  'scenes' : livedings.scenes})
 
 
 @app.route("/api/help")
