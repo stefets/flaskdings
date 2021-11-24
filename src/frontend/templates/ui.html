@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
 <div class="container">
 
   <!-- Header -->
@@ -11,10 +12,19 @@
       </h3>
     </div>
     <div class="col-md-8 bg-dark">
-      <!-- Fil d'ariane -->
-      <h3 class="bg-dark">
-        <span id="current_scene_name"></span> / <span id="current_subscene_name"></span>
-      </h3>
+      <div class="row">
+        <div class="col-md-8">
+          <h3>
+            <!-- Fil d'ariane -->
+            / <span id="current_scene_name"></span> / <span id="current_subscene_name"></span>
+          </h3>
+        </div>
+        <div class="col-md-4">
+          <span> <input class="btn btn-warning" type="button" id="restart" value="Restart"></span>
+          <span></span><input class="btn btn-warning" type="button" id="panic" value="Panic"></span>
+          <span></span><input class="btn btn-danger" type="button" id="quit" value="Quit"></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -30,35 +40,122 @@
   <div class="row">
 
     <div class="col-md-4 bg-secondary">
-      <br />
-      <div class="row mt-1 mb-1">
-        <div class="col-md-4">
-          <div class="btn btn-block btn-primary"><a
-              href="/api/mididings/restart{{ parameter | inject_endpoint }}">Restart</a>
-          </div>
+      Future console
+    </div>
+
+    <div class="col-md-8 bg-dark">
+      <div class="row">
+        <div class="col-md-3">
+          <input class="btn btn-block btn-info" type="button" id="prev_scene" value="Previous Scene">
         </div>
-        <div class="col-md-4">
-          <div class="btn btn-block btn-danger"><a href="/api/mididings/panic">Panic</a></div>
+        <div class="col-md-3">
+          <input class="btn btn-block btn-primary" type="button" id="prev_subscene" value="Previous Sub-Scene">
         </div>
-        <div class="col-md-4">
-          <div class="btn btn-block btn-dark"><a href="/api/mididings/quit{{ parameter | inject_endpoint }}">Quit</a>
-          </div>
+        <div class="col-md-3">
+          <input class="btn btn-block btn-primary" type="button" id="next_subscene" value="Next Sub-Scene">
+        </div>
+        <div class="col-md-3">
+          <input class="btn btn-block btn-info" type="button" id="next_scene" value="Next scene">
         </div>
       </div>
     </div>
 
-    <div class="col-md-8 bg-dark">
-      <form>
-        <div class="form-group">
-          <input class="btn btn-primary" type="button" id="next_scene" value="Next scene">
-          <input class="btn btn-primary" type="button" id="next_subscene" value="Next subscene">
-          <input class="btn btn-primary" type="button" id="prev_subscene" value="Prev subscene">
-          <input class="btn btn-primary" type="button" id="prev_scene" value="Prev scene">
-        </div>
-      </form>
-    </div>
-
   </div>
-</div>
 
+</div>
 {% endblock body %}
+
+{% block websockets %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
+    integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+
+      var socket = io()
+
+      // Refresh 
+      socket.on('mididings.update', function (livedings) {
+
+        $('#current_scene').text(livedings.current_scene);
+        $('#current_subscene').text(livedings.current_subscene);
+
+        var scene_name = livedings.scenes[livedings.current_scene][0]
+        var subscene_name = "...";
+
+        var has_subscene = (livedings.scenes[livedings.current_scene][1].length > 0);
+        if (has_subscene) {
+          subscene_name = livedings.scenes[livedings.current_scene][1][livedings.current_subscene - 1];
+        }
+
+        $('#current_scene_name').text(scene_name);
+        $('#current_subscene_name').text(subscene_name);
+
+        $('#scenes').text('');
+        for (let scene in livedings.scenes) {
+          // Scene
+          var scene_bloc = "<input class='btn btn-dark switch_scene' type='button' name='" + scene + "' value='" + livedings.scenes[scene][0] + "'>"
+          $('#scenes').append(scene_bloc);
+        }
+
+        // Subscenes of the current scene
+        $('#subscenes').text('');
+        if (has_subscene) {
+          for (let index in livedings.scenes[livedings.current_scene][1]) {
+            scene_id = parseInt(index) + 1;
+            var subscene_bloc = "<input class='btn btn-dark switch_subscene' type='button' name='" + scene_id.toString() + "' value='" + livedings.scenes[livedings.current_scene][1][index] + "'>"
+            $('#subscenes').append(subscene_bloc);
+          }
+        }
+      });
+
+      // Scene handlers
+      $("#scenes").delegate("input.switch_scene", "click", function (event) {
+        socket.emit('switch_scene', { id: $(this).attr('name') });
+        return false
+      });
+
+      $('#next_scene').click(function (event) {
+        socket.emit('next_scene');
+        return false;
+      });
+      $('#prev_scene').click(function (event) {
+        socket.emit('prev_scene');
+        return false;
+      });
+
+      // Subscene handlers
+      $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
+        socket.emit('switch_subscene', { id: $(this).attr('name') });
+        return false
+      });
+
+      $('#next_subscene').click(function (event) {
+        socket.emit('next_subscene');
+        return false;
+      });
+
+      $('#prev_subscene').click(function (event) {
+        socket.emit('prev_subscene');
+        return false;
+      });
+
+      // Restart, panic, quit
+      $('#restart').click(function (event) {
+        socket.emit('restart');
+        return false;
+      });
+
+      $('#panic').click(function (event) {
+        socket.emit('panic');
+        return false;
+      });
+
+      $('#quit').click(function (event) {
+        socket.emit('quit');
+        return false;
+      });
+
+    });
+  </script>
+{% endblock websockets %}

@@ -18,15 +18,7 @@
 </head>
 
 <body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+
     {% block body %}{% endblock %}
 
     <!-- Bootstrap core JavaScript -->
@@ -38,83 +30,8 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
-        integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
-        crossorigin="anonymous"></script>
 
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function () {
-            
-            var socket = io()
-            
-            // Refresh 
-            socket.on('mididings.update', function (livedings) {
-
-                $('#current_scene').text(livedings.current_scene);
-                $('#current_subscene').text(livedings.current_subscene);
-
-                var scene_name = livedings.scenes[livedings.current_scene][0]
-                var subscene_name = "...";
-                
-                var has_subscene = (livedings.scenes[livedings.current_scene][1].length > 0);
-                if (has_subscene) {
-                    subscene_name = livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1];
-                }
-
-                $('#current_scene_name').text(scene_name);
-                $('#current_subscene_name').text(subscene_name);
-
-                $('#scenes').text('');
-                for (let scene in livedings.scenes) {
-                    // Scene
-                    var scene_bloc = "<input class='btn btn-dark switch_scene' type='button' name='" + scene + "' value='" + livedings.scenes[scene][0] + "'>"
-                    $('#scenes').append(scene_bloc);
-                }
-
-                // Subscenes of the current scene
-                $('#subscenes').text('');
-                if (has_subscene){
-                    for (let index in livedings.scenes[livedings.current_scene][1]) {
-                        scene_id = parseInt(index) + 1;
-                        var subscene_bloc = "<input class='btn btn-dark switch_subscene' type='button' name='" + scene_id.toString() + "' value='" + livedings.scenes[livedings.current_scene][1][index] + "'>"
-                        $('#subscenes').append(subscene_bloc);
-                    }
-                }
-            });
-
-            // Scene handlers
-            $("#scenes").delegate("input.switch_scene", "click", function (event) {
-                socket.emit('switch_scene', { id: $(this).attr('name') });
-                return false
-            });
-
-            $('#next_scene').click(function (event) {
-                socket.emit('next_scene');
-                return false;
-            });
-            $('#prev_scene').click(function (event) {
-                socket.emit('prev_scene');
-                return false;
-            });
-
-            // Subscene handlers
-            $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
-                socket.emit('switch_subscene', { id: $(this).attr('name') });
-                return false
-            });
-
-            $('#next_subscene').click(function (event) {
-                socket.emit('next_subscene');
-                return false;
-            });
-            $('#prev_subscene').click(function (event) {
-                socket.emit('prev_subscene');
-                return false;
-            });
-
-        });
-    </script>
-
+    {% block websockets %}{% endblock websockets %}
 </body>
 
 </html>

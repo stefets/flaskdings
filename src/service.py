@@ -36,15 +36,19 @@ app.config['livedings'] = livedings
 app.register_blueprint(ui_blueprint)
 #
 
+'''
+    Api routes
+'''
+
 
 @app.route("/")
 @app.route("/api")
 def index():
-    return render_template('api.html')
+    return render_template('index.html')
 
 
 '''
-    Websockets
+    Websockets routes
 '''
 
 
@@ -78,6 +82,21 @@ def next_subscene():
     update_ui(livedings.next_subscene)
 
 
+@socketio.event
+def restart():
+    update_ui(livedings.restart)
+
+
+@socketio.event
+def panic():
+    update_ui(livedings.panic)
+
+
+@socketio.event
+def quit():
+    update_ui(livedings.quit)
+
+
 def update_ui(action, action_value=None):
 
     livedings()  # Set the ready flag to False TODO REWORKS
@@ -91,12 +110,12 @@ def update_ui(action, action_value=None):
         timeout += 1
         if timeout % 32 == 0:
             break
-    
+
     ''' WIP '''
     socketio.emit('mididings.update', {
                   'current_scene': livedings.current_scene,
                   'current_subscene': livedings.current_subscene,
-                  'scenes' : livedings.scenes})
+                  'scenes': livedings.scenes})
 
 
 @app.route("/api/help")
