@@ -66,96 +66,153 @@
 {% endblock body %}
 
 {% block websockets %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
-    integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
-    crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf-8">
-    $(document).ready(function () {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
+  integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
+  crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
 
-      var socket = io()
+    var socket = io()
 
-      // Refresh 
-      socket.on('mididings.update', function (livedings) {
+    socket.on('mididings.update', function (livedings) {
 
-        $('#current_scene').text(livedings.current_scene);
-        $('#current_subscene').text(livedings.current_subscene);
+      $('#current_scene').text(livedings.current_scene);
+      $('#current_subscene').text(livedings.current_subscene);
 
-        var scene_name = livedings.scenes[livedings.current_scene][0]
-        var subscene_name = "...";
+      var scene_name = livedings.scenes[livedings.current_scene][0]
+      var subscene_name = "...";
 
-        var has_subscene = (livedings.scenes[livedings.current_scene][1].length > 0);
-        if (has_subscene) {
-          subscene_name = livedings.scenes[livedings.current_scene][1][livedings.current_subscene - 1];
+      var has_subscene = (livedings.scenes[livedings.current_scene][1].length > 0);
+      if (has_subscene) {
+        subscene_name = livedings.scenes[livedings.current_scene][1][livedings.current_subscene - 1];
+      }
+
+      $('#current_scene_name').text(scene_name);
+      $('#current_subscene_name').text(subscene_name);
+
+      // Redraw the content section
+
+      $('#scenes').text('');
+      $('#subscenes').text('');
+
+      var html = ""
+      var cpt_s = 0;
+
+      // Scenes
+      for (let scene_id in livedings.scenes) {
+
+        if (cpt_s % 2 == 0) {
+          html += "<div class='row mt-1 mb-1'>"
         }
 
-        $('#current_scene_name').text(scene_name);
-        $('#current_subscene_name').text(subscene_name);
-
-        $('#scenes').text('');
-        for (let scene in livedings.scenes) {
-          // Scene
-          var scene_bloc = "<input class='btn btn-dark switch_scene' type='button' name='" + scene + "' value='" + livedings.scenes[scene][0] + "'>"
-          $('#scenes').append(scene_bloc);
+        // Button style
+        var button_class = "'btn btn-block switch_scene ";
+        if (parseInt(scene_id) == livedings.current_scene) {
+          button_class += "btn-success'";
+        } else {
+          button_class += "btn-dark'";
         }
 
-        // Subscenes of the current scene
-        $('#subscenes').text('');
-        if (has_subscene) {
-          for (let index in livedings.scenes[livedings.current_scene][1]) {
-            scene_id = parseInt(index) + 1;
-            var subscene_bloc = "<input class='btn btn-dark switch_subscene' type='button' name='" + scene_id.toString() + "' value='" + livedings.scenes[livedings.current_scene][1][index] + "'>"
-            $('#subscenes').append(subscene_bloc);
+        html += "<div class='col-md-6'>";
+        html += "<input class=" + button_class + " type='button' name='" + scene_id + "' value='" + livedings.scenes[scene_id][0] + "'>"
+        html += "</div>";
+
+        cpt_s++;
+
+        if (cpt_s % 2 == 0) {
+          html += "</div>";
+        }
+
+      }
+      $("#scenes").append(html);
+
+
+      // Subscenes 
+      if (has_subscene) {
+
+        cpt_s = 0;
+        html = "";
+
+        for (let subscene_index in livedings.scenes[livedings.current_scene][1]) {
+
+          if (cpt_s % 4 == 0) {
+            html += "<div class='row mt-1 mb-1'>"
           }
+
+          var subscene_id = parseInt(subscene_index) + 1;
+
+          // Button style
+          var button_class = "'btn btn-block switch_subscene ";
+          if (parseInt(subscene_id) == livedings.current_subscene) {
+            button_class += "btn-success'";
+          } else {
+            button_class += "btn-dark'";
+          }
+
+          html += "<div class='col-md-3'>";
+          html += "<input class=" + button_class + " type='button' name='" + subscene_id.toString() + "' value='" + livedings.scenes[livedings.current_scene][1][subscene_index] + "'>"
+          html += "</div>";
+
+          cpt_s++;
+
+          if (cpt_s % 4 == 0) {
+            html += "</div>";
+          }
+
         }
-      });
+        $('#subscenes').append(html);
 
-      // Scene handlers
-      $("#scenes").delegate("input.switch_scene", "click", function (event) {
-        socket.emit('switch_scene', { id: $(this).attr('name') });
-        return false
-      });
-
-      $('#next_scene').click(function (event) {
-        socket.emit('next_scene');
-        return false;
-      });
-      $('#prev_scene').click(function (event) {
-        socket.emit('prev_scene');
-        return false;
-      });
-
-      // Subscene handlers
-      $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
-        socket.emit('switch_subscene', { id: $(this).attr('name') });
-        return false
-      });
-
-      $('#next_subscene').click(function (event) {
-        socket.emit('next_subscene');
-        return false;
-      });
-
-      $('#prev_subscene').click(function (event) {
-        socket.emit('prev_subscene');
-        return false;
-      });
-
-      // Restart, panic, quit
-      $('#restart').click(function (event) {
-        socket.emit('restart');
-        return false;
-      });
-
-      $('#panic').click(function (event) {
-        socket.emit('panic');
-        return false;
-      });
-
-      $('#quit').click(function (event) {
-        socket.emit('quit');
-        return false;
-      });
+      }
 
     });
-  </script>
+
+    // Scene handlers
+    $("#scenes").delegate("input.switch_scene", "click", function (event) {
+      socket.emit('switch_scene', { id: $(this).attr('name') });
+      return false
+    });
+
+    $('#next_scene').click(function (event) {
+      socket.emit('next_scene');
+      return false;
+    });
+    $('#prev_scene').click(function (event) {
+      socket.emit('prev_scene');
+      return false;
+    });
+
+    // Subscene handlers
+    $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
+      socket.emit('switch_subscene', { id: $(this).attr('name') });
+      return false
+    });
+
+    $('#next_subscene').click(function (event) {
+      socket.emit('next_subscene');
+      return false;
+    });
+
+    $('#prev_subscene').click(function (event) {
+      socket.emit('prev_subscene');
+      return false;
+    });
+
+    // Restart, panic, quit
+    $('#restart').click(function (event) {
+      socket.emit('restart');
+      return false;
+    });
+
+    $('#panic').click(function (event) {
+      socket.emit('panic');
+      return false;
+    });
+
+    $('#quit').click(function (event) {
+      socket.emit('quit');
+      return false;
+    });
+
+  });
+</script>
 {% endblock websockets %}
