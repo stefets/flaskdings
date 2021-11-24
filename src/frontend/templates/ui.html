@@ -9,7 +9,7 @@
       <h3>
         Scene : <span id="current_scene"></span>.<span id="current_subscene"></span>
       </h3>
-      </div>
+    </div>
     <div class="col-md-8 bg-dark">
       <!-- Fil d'ariane -->
       <h3 class="bg-dark">
@@ -103,35 +103,16 @@
     </div>
 
     <div class="col-md-8 bg-dark">
-      <table class="table text-center table-sm">
-        <thead>
-          <tr>
-            <th scope="col">Scene</th>
-            <th scope="col">Subscene</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-                <form id="prev_scene" method="POST" action='#'>
-                  <input class="btn btn-primary" type="submit" value="Prev scene">
-                </form>
-                <form id="next_scene" method="POST" action='#'>
-                  <input class="btn btn-primary" type="submit" value="Next scene">
-                </form>
-            </td>
-            <td>
-              <form id="prev_subscene" method="POST" action='#'>
-                <input class="btn btn-primary" type="submit" value="Prev subscene">
-              </form>
-              <form id="next_subscene" method="POST" action='#'>
-                <input class="btn btn-primary" type="submit" value="Next subscene">
-              </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <form>
+        <div class="form-group">
+          <input class="btn btn-primary" type="button" id="next_scene" value="Next scene">
+          <input class="btn btn-primary" type="button" id="next_subscene" value="Next subscene">
+          <input class="btn btn-primary" type="button" id="prev_subscene" value="Prev subscene">
+          <input class="btn btn-primary" type="button" id="prev_scene" value="Prev scene">
+        </div>
+      </form>
     </div>
+
   </div>
 </div>
 

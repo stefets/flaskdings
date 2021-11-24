@@ -49,6 +49,17 @@ def index():
     Websockets
 '''
 
+
+@socketio.event
+def switch_scene(id):
+    update_ui(livedings.switch_scene, id)
+
+
+@socketio.event
+def switch_subscene(id):
+    update_ui(livedings.switch_subscene, id)
+
+
 @socketio.event
 def next_scene():
     update_ui(livedings.next_scene)
@@ -63,36 +74,32 @@ def prev_scene():
 def prev_subscene():
     update_ui(livedings.prev_subscene)
 
+
 @socketio.event
 def next_subscene():
     update_ui(livedings.next_subscene)
 
 
 def update_ui(action, action_value=None):
-    livedings()  # Set the ready flag to False
+
+    livedings()  # Set the ready flag to False TODO REWORKS
+
     action(action_value) if action_value else action()
+
+    ''' TODO REWORKS '''
     timeout = 0
     while not livedings.ready:
-        # We are here after an OSC process, wait a little before rendering
         sleep(0.0625)
         timeout += 1
         if timeout % 32 == 0:
             break
+    
+    ''' WIP '''
     socketio.emit('mididings.update', {
                   'current_scene': livedings.current_scene,
                   'current_subscene': livedings.current_subscene,
                   'current_scene_name': livedings.scenes[livedings.current_scene][0],
                   'current_subscene_name': livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1] if livedings.scenes[livedings.current_scene][1] else "..."})
-
-
-'''
-
-
-    if livedings.scenes[livedings.current_scene][1]|length > 0
-    livedings.scenes[livedings.current_scene][1][livedings.current_subscene-1]
-
-
-'''
 
 
 @app.route("/api/help")

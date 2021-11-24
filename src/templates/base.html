@@ -48,6 +48,7 @@
         $(document).ready(function () {
             var socket = io()
 
+            // Refresh 
             socket.on('mididings.update', function (context) {
                 $('#current_scene').text(context.current_scene);
                 $('#current_scene_name').text(context.current_scene_name);
@@ -55,19 +56,32 @@
                 $('#current_subscene_name').text(context.current_subscene_name);
             });
 
-            $('form#next_scene').submit(function(event) {
+            // Scene handlers
+/*             $('#switch_scene').click(function(event) {
+                socket.emit('switch_scene', {id: $('#close_room').val()});
+                return false;
+            }); */
+
+            $('#next_scene').click(function(event) {
                 socket.emit('next_scene');
                 return false;
             });
-            $('form#prev_scene').submit(function(event) {
+            $('#prev_scene').click(function(event) {
                 socket.emit('prev_scene');
                 return false;
             });
-            $('form#next_subscene').submit(function(event) {
+
+            // Subscene handlers
+/*             $('#switch_subscene').click(function(event) {
+                socket.emit('switch_subscene', {id: $('#close_room').val()});
+                return false;
+            }); */
+
+            $('#next_subscene').click(function(event) {
                 socket.emit('next_subscene');
                 return false;
             });
-            $('form#prev_subscene').submit(function(event) {
+            $('#prev_subscene').click(function(event) {
                 socket.emit('prev_subscene');
                 return false;
             });               
