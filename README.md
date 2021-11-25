@@ -8,8 +8,8 @@ A Flask API for MIDIDINGS
 * Provide a HTML5 frontend as an alternative to the livedings frontend
 * <img src="/doc/flaskdings.png" />
 
-# TODO
-* Find a simple strategy to push notifications to client's browser to refresh by itself
+# Depedencies
+* Flask-socketio
 
 # Support MIDIDINGS
 * Contributors and PR are welcome to improve my API and keep MIDIDINGS ALIVE
