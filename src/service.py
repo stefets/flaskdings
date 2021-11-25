@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 from frontend.views import ui_blueprint
 from osc.server import MididingsContext
 import os
@@ -52,6 +52,18 @@ def index():
 '''
 
 
+def emit_mididings_context():
+    socketio.emit('mididings_context_update', {
+                  'current_scene': livedings.current_scene,
+                  'current_subscene': livedings.current_subscene,
+                  'scenes': livedings.scenes})
+
+
+@socketio.event
+def get_mididings_context():
+    emit_mididings_context()
+
+
 @socketio.event
 def switch_scene(data):
     update_ui(livedings.switch_scene, int(data['id']))
@@ -89,17 +101,19 @@ def restart():
 
 @socketio.event
 def panic():
-    update_ui(livedings.panic)
+    # update_ui(livedings.panic)
+    livedings.panic()
 
 
 @socketio.event
 def quit():
-    update_ui(livedings.quit)
+    livedings.quit()
+    socketio.emit("mididings_context_quit")
 
 
 def update_ui(action, action_value=None):
-
-    livedings()  # Set the ready flag to False TODO REWORKS
+    ''' TODO REWORKS '''
+    livedings()  # Set the ready flag to False
 
     action(action_value) if action_value else action()
 
@@ -111,11 +125,7 @@ def update_ui(action, action_value=None):
         if timeout % 32 == 0:
             break
 
-    ''' WIP '''
-    socketio.emit('mididings.update', {
-                  'current_scene': livedings.current_scene,
-                  'current_subscene': livedings.current_subscene,
-                  'scenes': livedings.scenes})
+    emit_mididings_context()
 
 
 @app.route("/api/help")
@@ -144,23 +154,6 @@ def help():
 
     return jsonify(code=200, data=routes)
 
-
-@app.route("/api/ping")
-def ping():
-    return '', 204
-
-
-'''
-Jinja2 Filters
-This filter serve the API to determine if we render a view
-'''
-
-
-def inject_endpoint(param):
-    return param + request.endpoint
-
-
-jinja2.filters.FILTERS['inject_endpoint'] = inject_endpoint
 
 '''
 Errors

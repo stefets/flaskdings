@@ -65,7 +65,6 @@ class MididingsContext(object):
         self.osc.restart()
 
     def quit(self):
-        self.scenes = {}
         self.osc.quit()
 
     def switch_scene(self, value):
