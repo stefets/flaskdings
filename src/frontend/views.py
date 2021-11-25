@@ -8,7 +8,7 @@ ui_blueprint = Blueprint('ui_blueprint', __name__,
 @ui_blueprint.route("/")
 def index():
     dings_context = current_app.config['livedings']
-    if dings_context.ready and dings_context.scenes:
+    if dings_context.scenes:
         return render_template('ui.html')
     else:
         return render_template('nodings.html')

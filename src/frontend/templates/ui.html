@@ -10,16 +10,16 @@
     <div class="col-md-4 bg-secondary">
 
       <div class="row">
-        <div class="col-md-3"> 
+        <div class="col-md-3">
           <input class="btn btn-warning" type="button" id="restart" value="Restart">
         </div>
-        <div class="col-md-3"> 
+        <div class="col-md-3">
           <input class="btn btn-warning" type="button" id="panic" value="Panic">
-        </div>       
-        <div class="col-md-3"> 
+        </div>
+        <div class="col-md-3">
           <!-- Futur candidate -->
         </div>
-        <div class="col-md-3"> 
+        <div class="col-md-3">
           <input class="btn btn-danger" type="button" id="quit" value="Quit">
         </div>
       </div>
@@ -98,6 +98,7 @@
   </div>
 
 </div>
+
 {% endblock body %}
 
 {% block websockets %}
@@ -117,7 +118,7 @@
       $('#mididings').html('<div class="bg-success">RUNNING</div>');
     });
 
-    socket.on('mididings_context_quit', function () {
+    socket.on('application_shutdown', function () {
       socket.disconnect();
       $('#websockets').html('<div class="bg-danger">DISCONNECTED</div>');
       $('#mididings').html('<div class="bg-danger">STOPPED</div>');

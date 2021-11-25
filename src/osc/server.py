@@ -21,6 +21,10 @@ class OscServer(LiveOSC):
     def restart(self):
         self.send(self.control_port, '/mididings/restart')
 
+    @liblo.make_method('/mididings/running', '')
+    def running_cb(self, path, args):
+        pass
+
 
 '''
 This class is the equivalent of the mididings.live.livedings.LiveDings
@@ -28,7 +32,7 @@ This class is the equivalent of the mididings.live.livedings.LiveDings
 
 
 class MididingsContext(object):
-    def __init__(self, options):
+    def __init__(self, options, signal):
 
         self.osc = OscServer(
             self, options["control_port"], options["listen_port"])
@@ -39,7 +43,7 @@ class MididingsContext(object):
         self.current_subscene = -1
         self.data_offset = -1
         self.scenes = {}
-        self.ready = False
+        self.signal = signal
 
         self.osc.query()
 
@@ -86,4 +90,4 @@ class MididingsContext(object):
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
-        self.ready = True # This is the last OSC operation so we are truly ready
+        self.signal.send(self)  # This is the last OSC operation so we are truly ready to signal
