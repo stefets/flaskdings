@@ -1,40 +1,78 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask_socketio import SocketIO
-from frontend.views import ui_blueprint
-from osc.server import MididingsContext
-import os
+''' PRODUCTION '''
+#import eventlet
+# eventlet.monkey_patch()
+
+from werkzeug.exceptions import HTTPException
+from flask import Flask, render_template
+from flask.signals import Namespace
 import json
+import os
+from osc.server import MididingsContext
+from frontend.views import ui_blueprint
+from flask_socketio import SocketIO
+
+from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
 
 ''' Flask '''
-from flask import Flask, render_template, jsonify
-from flask.signals import Namespace
-from werkzeug.exceptions import HTTPException
-from werkzeug.utils import import_string
-
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
-''' Signal '''
-namespace = Namespace()
-osc_message = namespace.signal('osc_message')
-
-
-''' Websockets '''
-socketio = SocketIO(app)
-
 
 """  Configuration """
 filename = os.path.join(app.static_folder, 'config.json')
 with open(filename) as FILE:
     configuration = json.load(FILE)
 
-"""  OSC Service """
+''' Flask config '''
+app.secret_key = configuration["secret_key"]
+
+''' Signal from the OSC thread '''
+
+namespace = Namespace()
+osc_server_signal = namespace.signal('osc_server')
+
+
+''' Websockets '''
+socketio = SocketIO(app, logger=True, engineio_logger=True)
+
+
+def initialize_observer(socket, dings, observable_path):
+
+    class Handler(FileSystemEventHandler):
+        def __init__(self, socket, dings):
+            super().__init__()
+            self.socket = socket
+            self.dings = dings
+
+        def on_modified(self, event):
+            print([self.on_modified, self, event])
+            self.socket.emit('mididings_context_update', {
+                'current_scene': self.dings.current_scene,
+                'current_subscene': self.dings.current_subscene,
+                'scenes': self.dings.scenes})
+
+    observer = Observer()
+    observer.schedule(Handler(socket, dings),
+                      path=observable_path, recursive=False)
+    observer.start()
+
+
 livedings = None
+inotify_path = None
+inotify_file = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = MididingsContext(configuration["osc_server"], osc_message)
+    livedings = MididingsContext(
+        configuration["osc_server"], osc_server_signal)
+
+    inotify_path = Path(configuration["watchdog"])
+    inotify_file = Path(configuration["watchdog"]).joinpath(configuration["watchdog_file"])
+    inotify_path.mkdir(parents=True, exist_ok=True)
+    initialize_observer(socketio, livedings, inotify_path)
 
 
 """  Bluebrint(s) """
@@ -55,22 +93,20 @@ def index():
     return render_template('index.html')
 
 
-'''
-    Websockets routes
-'''
+''' OSC server signals '''
 
 
-@osc_message.connect
-def emit_mididings_context(sender=None):
-    socketio.emit('mididings_context_update', {
-                  'current_scene': livedings.current_scene,
-                  'current_subscene': livedings.current_subscene,
-                  'scenes': livedings.scenes})
+@osc_server_signal.connect
+def osc_emit_mididings_context(sender):
+    inotify_file.touch(exist_ok=True)
+
+
+''' Websockets calls '''
 
 
 @socketio.event
 def get_mididings_context():
-    emit_mididings_context()
+    inotify_file.touch(exist_ok=True)
 
 
 @socketio.event
@@ -86,6 +122,7 @@ def switch_subscene(data):
 @socketio.event
 def next_scene():
     livedings.next_scene()
+    emit_mididings_context()
 
 
 @socketio.event

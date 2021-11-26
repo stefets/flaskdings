@@ -11,6 +11,7 @@ class OscServer(LiveOSC):
     def __init__(self, dings, control_port, listen_port):
         super().__init__(dings, control_port, listen_port)
 
+
     ''' Quit mididings '''
 
     def quit(self):
@@ -44,6 +45,7 @@ class MididingsContext(object):
         self.data_offset = -1
         self.scenes = {}
         self.signal = signal
+        self.dirty = False
 
         self.osc.query()
 
@@ -90,4 +92,6 @@ class MididingsContext(object):
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
-        self.signal.send(self)  # This is the last OSC operation so we are truly ready to signal
+        self.dirty = True
+        # This is the last OSC operation so we are truly ready to signal
+        self.signal.send(self)
