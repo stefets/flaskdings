@@ -11,7 +11,6 @@ class OscServer(LiveOSC):
     def __init__(self, dings, control_port, listen_port):
         super().__init__(dings, control_port, listen_port)
 
-
     ''' Quit mididings '''
 
     def quit(self):
@@ -49,9 +48,6 @@ class MididingsContext(object):
 
         self.osc.query()
 
-    def __call__(self):
-        self.ready = False
-
     def next_scene(self):
         self.osc.next_scene()
 
@@ -79,9 +75,7 @@ class MididingsContext(object):
     def switch_subscene(self, value):
         self.osc.switch_subscene(value)
 
-    '''
-    Set by OscServer
-    '''
+    '''     Set by OscServer     '''
 
     def set_data_offset(self, data_offset):
         self.data_offset = data_offset
@@ -92,6 +86,4 @@ class MididingsContext(object):
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
-        self.dirty = True
-        # This is the last OSC operation so we are truly ready to signal
-        self.signal.send(self)
+        self.dirty = True # This is the last OSC operation. Set dirty flag for the Observer Thread
