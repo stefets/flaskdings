@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from werkzeug.exceptions import HTTPException
-from flask import Flask, render_template
-from flask.signals import Namespace
-import json
-import os
-from osc.server import MididingsContext
-from frontend.views import ui_blueprint
-from flask_socketio import SocketIO
 from threading import Lock
-import eventlet
-eventlet.monkey_patch()
+from flask_socketio import SocketIO
+from frontend.views import ui_blueprint
+from osc.server import MididingsContext
+import os
+import json
+from flask.signals import Namespace
+from flask import Flask, render_template
+from werkzeug.exceptions import HTTPException
 
 
 ''' Flask '''
 
 app = Flask(__name__)
+
+if not app.debug:
+    import eventlet
+    eventlet.monkey_patch()
+
 
 """  Configuration """
 filename = os.path.join(app.static_folder, 'config.json')
@@ -33,7 +36,7 @@ osc_server_signal = namespace.signal('osc_server')
 
 
 ''' Websockets '''
-socketio = SocketIO(app)  # , logger=True, engineio_logger=True)
+socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
 thread = None
 thread_lock = Lock()
 
@@ -42,10 +45,7 @@ def osc_observer_thread():
     while True:
         socketio.sleep(0.125)
         if livedings.dirty:
-            socketio.emit('mididings_context_update', {
-                'current_scene': livedings.current_scene,
-                'current_subscene': livedings.current_subscene,
-                'scenes': livedings.scenes})
+            emit_mididings_context()
             livedings.dirty = False
 
 
@@ -77,8 +77,8 @@ def index():
 
 
 @osc_server_signal.connect
-def mididings_context_changed(sender):
-    livedings.dirty = True
+def mididings_context_changed(sender, **kwargs):
+    livedings.dirty = kwargs.get('refresh', False)
 
 
 ''' Websockets calls '''
@@ -176,4 +176,4 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5555)

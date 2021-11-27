@@ -3,7 +3,7 @@ from mididings.live.osc_control import LiveOSC
 import liblo
 
 '''
-OSC Server 
+OSC Server
 '''
 
 
@@ -21,12 +21,16 @@ class OscServer(LiveOSC):
     def restart(self):
         self.send(self.control_port, '/mididings/restart')
 
+    ''' Future purpose '''
+
     @liblo.make_method('/mididings/running', '')
     def running_cb(self, path, args):
         pass
 
 
 '''
+
+
 This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
 
@@ -43,6 +47,7 @@ class MididingsContext(object):
         self.current_subscene = -1
         self.data_offset = -1
         self.scenes = {}
+        
         self.signal = signal
         self.dirty = False
 
@@ -68,6 +73,7 @@ class MididingsContext(object):
 
     def quit(self):
         self.osc.quit()
+        self.signal.send(self, terminate=True)
 
     def switch_scene(self, value):
         self.osc.switch_scene(value)
@@ -86,4 +92,7 @@ class MididingsContext(object):
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
-        self.dirty = True # This is the last OSC operation. Set dirty flag for the Observer Thread
+
+        # This is the last OSC operation.
+        # Signal the service to refresh clients
+        self.signal.send(self, refresh=True)
