@@ -113,7 +113,7 @@
     var socket = io()
 
     socket.on('connect', function () {
-      socket.emit('get_mididings_context');
+      socket.emit('sio_get_mididings_context');
       $('#websockets').html('<div class="bg-success">ONLINE</div>');
       $('#mididings').html('<div class="bg-success">RUNNING</div>');
     });
@@ -219,49 +219,49 @@
 
     // Scene navigation handlers
     $("#scenes").delegate("input.switch_scene", "click", function (event) {
-      socket.emit('switch_scene', { id: $(this).attr('name') });
+      socket.emit('sio_switch_scene', { id: $(this).attr('name') });
       return false
     });
 
     $('#next_scene').click(function (event) {
-      socket.emit('next_scene');
+      socket.emit('sio_next_scene');
       return false;
     });
 
     $('#prev_scene').click(function (event) {
-      socket.emit('prev_scene');
+      socket.emit('sio_prev_scene');
       return false;
     });
 
     // Subscene navigation handlers
     $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
-      socket.emit('switch_subscene', { id: $(this).attr('name') });
+      socket.emit('sio_switch_subscene', { id: $(this).attr('name') });
       return false
     });
 
     $('#next_subscene').click(function (event) {
-      socket.emit('next_subscene');
+      socket.emit('sio_next_subscene');
       return false;
     });
 
     $('#prev_subscene').click(function (event) {
-      socket.emit('prev_subscene');
+      socket.emit('sio_prev_subscene');
       return false;
     });
 
     // Restart, panic, quit handlers
     $('#restart').click(function (event) {
-      socket.emit('restart');
+      socket.emit('sio_restart');
       return false;
     });
 
     $('#panic').click(function (event) {
-      socket.emit('panic');
+      socket.emit('sio_panic');
       return false;
     });
 
     $('#quit').click(function (event) {
-      socket.emit('quit');
+      socket.emit('sio_quit');
       return false;
     });
 
