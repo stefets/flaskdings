@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from threading import Lock
 from flask_socketio import SocketIO
 from frontend.views import ui_blueprint
 from osc.server import MididingsContext
 import os
 import json
+from flask.signals import Namespace
+from flask import Flask, render_template
+from werkzeug.exceptions import HTTPException
+
 
 ''' Flask '''
-from flask import Flask, render_template, jsonify
-from flask.signals import Namespace
-from werkzeug.exceptions import HTTPException
-from werkzeug.utils import import_string
-
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-''' Signal '''
-namespace = Namespace()
-osc_message = namespace.signal('osc_message')
-
-
-''' Websockets '''
-socketio = SocketIO(app)
+if not app.debug:
+    import eventlet
+    eventlet.monkey_patch()
 
 
 """  Configuration """
@@ -31,10 +26,33 @@ filename = os.path.join(app.static_folder, 'config.json')
 with open(filename) as FILE:
     configuration = json.load(FILE)
 
-"""  OSC Service """
+''' Flask config '''
+app.secret_key = configuration["secret_key"]
+
+''' Signal from the OSC thread '''
+
+namespace = Namespace()
+osc_server_signal = namespace.signal('osc_server')
+
+
+''' Websockets '''
+socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
+thread = None
+thread_lock = Lock()
+
+
+def osc_observer_thread():
+    while True:
+        socketio.sleep(0.125)
+        if livedings.dirty:
+            emit_mididings_context()
+            livedings.dirty = False
+
+
 livedings = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = MididingsContext(configuration["osc_server"], osc_message)
+    livedings = MididingsContext(
+        configuration["osc_server"], osc_server_signal)
 
 
 """  Bluebrint(s) """
@@ -55,13 +73,26 @@ def index():
     return render_template('index.html')
 
 
-'''
-    Websockets routes
-'''
+''' OSC server signals '''
 
 
-@osc_message.connect
-def emit_mididings_context(sender=None):
+@osc_server_signal.connect
+def mididings_context_changed(sender, **kwargs):
+    livedings.dirty = kwargs.get('refresh', False)
+
+
+''' Websockets calls '''
+
+
+@socketio.event
+def connect():
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(osc_observer_thread)
+
+
+def emit_mididings_context():
     socketio.emit('mididings_context_update', {
                   'current_scene': livedings.current_scene,
                   'current_subscene': livedings.current_subscene,
@@ -145,4 +176,4 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5555)
