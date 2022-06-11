@@ -1,10 +1,10 @@
 # flaskdings
 A simple and effective API and UI for MIDIDINGS
 
-# Goals
+# Features
 ## A backend
-* Websockets support
-* The OSC server that communicate with MIDIDINGS
+* An OSC server that communicate with MIDIDINGS
+* Websockets layer
 * A REST API layer
 ## A frontend
 * Provide a HTML5 frontend as an alternative to the livedings frontend
@@ -12,6 +12,7 @@ A simple and effective API and UI for MIDIDINGS
 * <img src="/doc/flaskdings.png" />
 
 # Depedencies
+* Flask
 * Flask-socketio
 * Blinker
 * eventlet
