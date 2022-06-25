@@ -1,44 +1,9 @@
-from mididings.live.osc_control import LiveOSC
-
-import liblo
-
 '''
-OSC Server
+    This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
+from .server import OscServer
 
-
-class OscServer(LiveOSC):
-    def __init__(self, dings, control_port, listen_port):
-        super().__init__(dings, control_port, listen_port)
-
-    ''' Quit mididings '''
-
-    def quit(self):
-        self.send(self.control_port, '/mididings/quit')
-
-    ''' Restart mididings '''
-
-    def restart(self):
-        self.send(self.control_port, '/mididings/restart')
-
-    def query(self):
-        self.send(self.control_port, '/mididings/query')
-
-    ''' Future purpose '''
-
-    @liblo.make_method('/mididings/running', '')
-    def running_cb(self, path, args):
-        pass
-
-
-'''
-
-
-This class is the equivalent of the mididings.live.livedings.LiveDings
-'''
-
-
-class MididingsContext(object):
+class Context(object):
     def __init__(self, options, signal):
 
         self.osc = OscServer(
@@ -47,7 +12,13 @@ class MididingsContext(object):
         self.osc.start()
 
         self.current_scene = -1
+        self.scene_name = ""
+
         self.current_subscene = -1
+        self.subscene_name = ""
+
+        self.has_subscene = False
+
         self.data_offset = -1
         self.scenes = {}
         
@@ -87,17 +58,24 @@ class MididingsContext(object):
     def switch_subscene(self, value):
         self.osc.switch_subscene(value)
 
-    '''     Set by OscServer     '''
+    ''' OscServer callbacks '''
 
     def set_data_offset(self, data_offset):
         self.data_offset = data_offset
 
+
     def set_scenes(self, value):
         self.scenes = value
+
 
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
         self.current_subscene = subscene
+
+        self.scene_name = self.scenes[scene][0]
+
+        self.has_subscene = self.scenes[scene][1]
+        self.subscene_name = self.scenes[scene][1][subscene-1] if self.has_subscene else "..."        
 
         # This is the last OSC operation.
         # Signal the service to refresh clients
