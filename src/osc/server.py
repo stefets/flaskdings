@@ -21,6 +21,9 @@ class OscServer(LiveOSC):
     def restart(self):
         self.send(self.control_port, '/mididings/restart')
 
+    def query(self):
+        self.send(self.control_port, '/mididings/query')
+
     ''' Future purpose '''
 
     @liblo.make_method('/mididings/running', '')
@@ -70,6 +73,9 @@ class MididingsContext(object):
 
     def restart(self):
         self.osc.restart()
+
+    def query(self):
+        self.osc.query()
 
     def quit(self):
         self.osc.quit()

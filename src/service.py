@@ -186,6 +186,9 @@ def sio_restart():
 def sio_panic():
     _panic()
 
+@socketio.event
+def sio_query():
+    _query()
 
 @socketio.event
 def sio_quit():
@@ -217,6 +220,10 @@ def _quit():
 
 def _panic():
     livedings.panic()
+
+
+def _query():
+    livedings.query()
 
 
 def _restart():
@@ -254,7 +261,7 @@ Error Handling
 
 @socketio.on_error()
 def error_handler(e):
-    print("socketio.on_error")
+    print(e)
 
 
 @app.errorhandler(HTTPException)
