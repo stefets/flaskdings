@@ -118,25 +118,15 @@
             $('#mididings').html('<div class="bg-danger">STOPPED</div>');
         });
 
+        socket.on('mididings_context_update', function(ld) {
 
-        socket.on('mididings_context_update', function(livedings) {
+            $('#current_scene').text(ld.current_scene);
+            $('#current_scene_name').text(ld.scene_name);
 
-            $('#current_scene').text(livedings.current_scene);
-            $('#current_subscene').text(livedings.current_subscene);
-
-            var scene_name = livedings.scenes[livedings.current_scene][0]
-            var subscene_name = "...";
-
-            var has_subscene = (livedings.scenes[livedings.current_scene][1].length > 0);
-            if (has_subscene) {
-                subscene_name = livedings.scenes[livedings.current_scene][1][livedings.current_subscene - 1];
-            }
-
-            $('#current_scene_name').text(scene_name);
-            $('#current_subscene_name').text(subscene_name);
+            $('#current_subscene').text(ld.current_subscene);
+            $('#current_subscene_name').text(ld.subscene_name);
 
             // Redraw the content section
-
             $('#scenes').text('');
             $('#subscenes').text('');
 
@@ -144,66 +134,58 @@
             var cpt_s = 0;
 
             // Scenes
-            for (let scene_id in livedings.scenes) {
+            for (let scene_id in ld.scenes) {
 
-                if (cpt_s % 2 == 0) {
-                    html += "<div class='row mt-1 mb-1'>"
-                }
+                if (cpt_s % 2 == 0)
+                    html += "<div class='row mt-1 mb-1'>";
 
                 // Button style
                 var button_class = "'btn btn-block switch_scene ";
-                if (parseInt(scene_id) == livedings.current_scene) {
+                if (parseInt(scene_id) == ld.current_scene)
                     button_class += "btn-light'";
-                } else {
+                else
                     button_class += "btn-dark'";
-                }
 
                 html += "<div class='col-md-6'>";
-                html += "<input class=" + button_class + " type='button' name='" + scene_id + "' value='" + livedings.scenes[scene_id][0] + "'>"
+                html += "<input class=" + button_class + " type='button' name='" + scene_id + "' value='" + ld.scenes[scene_id][0] + "'>"
                 html += "</div>";
 
                 cpt_s++;
 
-                if (cpt_s % 2 == 0) {
+                if (cpt_s % 2 == 0)
                     html += "</div>";
-                }
-
             }
             $("#scenes").append(html);
 
 
             // Subscenes 
-            if (has_subscene) {
+            if (ld.has_subscene) {
 
                 cpt_s = 0;
                 html = "";
 
-                for (let subscene_index in livedings.scenes[livedings.current_scene][1]) {
+                for (let subscene_index in ld.scenes[ld.current_scene][1]) {
 
-                    if (cpt_s % 4 == 0) {
-                        html += "<div class='row mt-1 mb-1'>"
-                    }
+                    if (cpt_s % 4 == 0)
+                        html += "<div class='row mt-1 mb-1'>";
 
                     var subscene_id = parseInt(subscene_index) + 1;
 
                     // Button style
                     var button_class = "'btn btn-block switch_subscene ";
-                    if (parseInt(subscene_id) == livedings.current_subscene) {
+                    if (parseInt(subscene_id) == ld.current_subscene)
                         button_class += "btn-light'";
-                    } else {
+                    else
                         button_class += "btn-secondary'";
-                    }
 
                     html += "<div class='col-md-3'>";
-                    html += "<input class=" + button_class + " type='button' name='" + subscene_id.toString() + "' value='" + livedings.scenes[livedings.current_scene][1][subscene_index] + "'>"
+                    html += "<input class=" + button_class + " type='button' name='" + subscene_id.toString() + "' value='" + ld.scenes[ld.current_scene][1][subscene_index] + "'>"
                     html += "</div>";
 
                     cpt_s++;
 
-                    if (cpt_s % 4 == 0) {
+                    if (cpt_s % 4 == 0)
                         html += "</div>";
-                    }
-
                 }
                 $('#subscenes').append(html);
 
@@ -211,62 +193,59 @@
 
         });
 
-        // Scene navigation handlers
+        // Scene navigation delegate
         $("#scenes").delegate("input.switch_scene", "click", function(event) {
-            socket.emit('sio_switch_scene', {
+            return emit('sio_switch_scene', {
                 id: $(this).attr('name')
             });
-            return false
+        });
+
+        // Sub-Scene navigation delegate
+        $("#subscenes").delegate("input.switch_subscene", "click", function(event) {
+            return emit('sio_switch_subscene', {
+                id: $(this).attr('name')
+            });
         });
 
         $('#next_scene').click(function(event) {
-            socket.emit('sio_next_scene');
-            return false;
+            return emit('sio_next_scene');
         });
 
         $('#prev_scene').click(function(event) {
-            socket.emit('sio_prev_scene');
-            return false;
-        });
-
-        // Subscene navigation handlers
-        $("#subscenes").delegate("input.switch_subscene", "click", function(event) {
-            socket.emit('sio_switch_subscene', {
-                id: $(this).attr('name')
-            });
-            return false
+            return emit('sio_prev_scene');
         });
 
         $('#next_subscene').click(function(event) {
-            socket.emit('sio_next_subscene');
-            return false;
+            return emit('sio_next_subscene');
         });
 
         $('#prev_subscene').click(function(event) {
-            socket.emit('sio_prev_subscene');
-            return false;
+            return emit('sio_prev_subscene');
         });
 
-        // Restart, panic, quit handlers
         $('#restart').click(function(event) {
-            socket.emit('sio_restart');
-            return false;
+            return emit('sio_restart');
         });
 
         $('#panic').click(function(event) {
-            socket.emit('sio_panic');
-            return false;
+            return emit('sio_panic');
         });
 
         $('#query').click(function(event) {
-            socket.emit('sio_query');
-            return false;
+            return emit('sio_query');
         });
 
         $('#quit').click(function(event) {
-            socket.emit('sio_quit');
-            return false;
+            return emit('sio_quit');
         });
+
+        function emit(route, data = null) {
+            if (data == null)
+                socket.emit(route);
+            else
+                socket.emit(route, data);
+            return false;
+        }
 
     });
 </script>

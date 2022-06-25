@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from threading import Lock
-from flask_socketio import SocketIO
-from frontend.views import ui_blueprint
-from osc.server import MididingsContext
 import os
 import json
+from threading import Lock
+
+from flask_socketio import SocketIO
 from flask.signals import Namespace
 from flask import Flask, render_template
 from werkzeug.exceptions import HTTPException
 
+from interface.views import ui_blueprint
+from services.mididings import Context
 
-''' Flask '''
 
 app = Flask(__name__)
 
@@ -28,31 +28,26 @@ with open(filename) as FILE:
     configuration = json.load(FILE)
 
 ''' Flask config '''
-
 app.secret_key = configuration["secret_key"]
 
 ''' Signal from the OSC thread '''
-
 namespace = Namespace()
 osc_server_signal = namespace.signal('osc_server')
 
 
 ''' Websockets context '''
-
 socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
 thread = None
 thread_lock = Lock()
 
 ''' Mididings context '''
-
 livedings = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = MididingsContext(
+    livedings = Context(
         configuration["osc_server"], osc_server_signal)
 
 
 """  Bluebrint(s) """
-
 app.config['livedings'] = livedings
 app.register_blueprint(ui_blueprint)
 
@@ -131,7 +126,11 @@ def emit_mididings_context():
     socketio.emit('mididings_context_update', {
                   'current_scene': livedings.current_scene,
                   'current_subscene': livedings.current_subscene,
-                  'scenes': livedings.scenes})
+                  'scenes': livedings.scenes,
+                  "scene_name" : livedings.scene_name,
+                  "subscene_name" : livedings.subscene_name,
+                  "has_subscene" : livedings.has_subscene
+                  })
 
 
 @socketio.event
