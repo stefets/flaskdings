@@ -1,7 +1,7 @@
 '''
     This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
-from .server import OscServer
+from .osc import OscServer
 
 class Context(object):
     def __init__(self, options, signal):
