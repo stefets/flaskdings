@@ -12,6 +12,7 @@ A simple and effective API and UI for MIDIDINGS
 * <img src="/doc/flaskdings.png" />
 
 # Depedencies
+* mididings
 * Flask
 * Flask-socketio
 * Blinker
@@ -21,5 +22,6 @@ A simple and effective API and UI for MIDIDINGS
 * Contributors and PR are welcome to improve flaskdings and keep MIDIDINGS ALIVE
 
 # Mididings ressources
+* https://www.github.com/mididings/mididings (New community fork!)
 * http://dsacre.github.io/mididings/doc/
 * https://groups.google.com/g/mididings
