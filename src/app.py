@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 import os
 import json
 from threading import Lock

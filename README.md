@@ -21,6 +21,13 @@ A simple and effective API and UI for MIDIDINGS
 # Support MIDIDINGS
 * Contributors and PR are welcome to improve flaskdings and keep MIDIDINGS ALIVE
 
+# License
+All files in this repository are released under the terms of the GNU
+General Public License as published by the Free Software Foundation;
+either version 2 of the License, or (at your option) any later version.
+
+For more details, please read the LICENSE file.
+
 # Mididings ressources
 * https://www.github.com/mididings/mididings (New community fork!)
 * http://dsacre.github.io/mididings/doc/
