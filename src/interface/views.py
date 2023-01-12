@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 from flask import Blueprint, render_template, current_app
 
 ui_blueprint = Blueprint('ui_blueprint', __name__,
