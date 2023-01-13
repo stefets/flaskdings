@@ -4,7 +4,5 @@
       "control_port" :56418,
       "listen_port" : 56419
    },
-   "secret_key" : "flaskdings",
-   "watchdog" : "/tmp/flaskdings/",
-   "watchdog_file" : "osc-server-notification.tmp"
+   "secret_key" : "flaskdings"
 }
