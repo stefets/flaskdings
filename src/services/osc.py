@@ -20,13 +20,3 @@ class OscServer(LiveOSC):
         self.send(self.control_port, '/mididings/restart')
 
     
-    def query(self):
-        self.send(self.control_port, '/mididings/query')
-
-
-    ''' 
-        Future usage or tests 
-    '''
-    @liblo.make_method('/mididings/running', '')
-    def running_cb(self, path, args):
-        pass
