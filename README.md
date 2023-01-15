@@ -16,7 +16,6 @@ A simple and effective API and UI for Mididings community version
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
 * Flask
 * Flask-socketio
-* Blinker
 * eventlet
 
 # Support Flaskdings
