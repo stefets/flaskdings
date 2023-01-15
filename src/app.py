@@ -8,12 +8,11 @@ import json
 from threading import Lock
 
 from flask_socketio import SocketIO
-from flask.signals import Namespace
 from flask import Flask, render_template
 from werkzeug.exceptions import HTTPException
 
-from interface.views import ui_blueprint
-from services.mididings import Context
+from blueprint.views import frontend
+from services.dings import OscContext
 
 
 app = Flask(__name__)
@@ -32,26 +31,22 @@ with open(filename) as FILE:
 ''' Flask config '''
 app.secret_key = configuration["secret_key"]
 
-''' Signal from the OSC thread '''
-namespace = Namespace()
-osc_server_signal = namespace.signal('osc_server')
-
 
 ''' Websockets context '''
 socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
 thread = None
 thread_lock = Lock()
 
-''' Mididings context '''
-livedings = None
+''' Mididings OSC context '''
+dings_context = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    livedings = Context(
-        configuration["osc_server"], osc_server_signal)
+    dings_context = OscContext(
+        configuration["osc_server"])
 
 
 """  Bluebrint(s) """
-app.config['livedings'] = livedings
-app.register_blueprint(ui_blueprint)
+app.config['dings_context'] = dings_context
+app.register_blueprint(frontend)
 
 
 '''
@@ -60,62 +55,59 @@ app.register_blueprint(ui_blueprint)
 
 
 @app.route("/")
-@app.route("/api")
-@app.route("/home")
-@app.route("/index")
 def index():
     return render_template('index.html')
 
 
-@app.route("/api/next_scene")
+@app.route("/next_scene")
 def api_next_scene():
     _next_scene()
     return '', 204
 
 
-@app.route("/api/prev_scene")
+@app.route("/prev_scene")
 def api_prev_scene():
     _prev_scene()
     return '', 204
 
 
-@app.route("/api/next_subscene")
+@app.route("/next_subscene")
 def api_next_subscene():
     _next_subscene()
     return '', 204
 
 
-@app.route("/api/prev_subscene")
+@app.route("/prev_subscene")
 def api_prev_subscene():
     _prev_subscene()
     return '', 204
 
 
-@app.route("/api/switch_scene/<int:id>")
+@app.route("/switch_scene/<int:id>")
 def api_switch_scene(id):
     _switch_scene(id)
     return '', 204
 
 
-@app.route("/api/switch_subscene/<int:id>")
+@app.route("/switch_subscene/<int:id>")
 def api_switch_subscene(id):
     _switch_subscene(id)
     return '', 204
 
 
-@app.route("/api/quit")
+@app.route("/quit")
 def api_quit():
     _quit()
     return '', 204
 
 
-@app.route("/api/panic")
+@app.route("/panic")
 def api_panic():
     _panic()
     return '', 204
 
 
-@app.route("/api/restart")
+@app.route("/restart")
 def api_restart():
     _restart()
     return '', 204
@@ -124,14 +116,15 @@ def api_restart():
 ''' Websockets event routes '''
 
 
-def emit_mididings_context():
+def mididings_context_update():
+    dings_context.dirty = False
     socketio.emit('mididings_context_update', {
-                  'current_scene': livedings.current_scene,
-                  'current_subscene': livedings.current_subscene,
-                  'scenes': livedings.scenes,
-                  "scene_name" : livedings.scene_name,
-                  "subscene_name" : livedings.subscene_name,
-                  "has_subscene" : livedings.has_subscene
+                  'current_scene': dings_context.current_scene,
+                  'current_subscene': dings_context.current_subscene,
+                  'scenes': dings_context.scenes,
+                  "scene_name" : dings_context.scene_name,
+                  "subscene_name" : dings_context.subscene_name,
+                  "has_subscene" : dings_context.has_subscene
                   })
 
 
@@ -145,7 +138,7 @@ def connect():
 
 @socketio.event
 def sio_get_mididings_context():
-    emit_mididings_context()
+    mididings_context_update()
 
 
 @socketio.event
@@ -194,65 +187,61 @@ def sio_query():
 @socketio.event
 def sio_quit():
     _quit()
-    socketio.emit("application_shutdown")
+    socketio.emit("on_terminate")
 
 
 
 ''' Mididings  '''
 
-''' OSC server signals '''
-
-@osc_server_signal.connect
-def mididings_context_changed(sender, **kwargs):
-    livedings.dirty = kwargs.get('refresh', False)
 
 def osc_observer_thread():
     while True:
+        if dings_context.dirty:
+            mididings_context_update()
+        socketio.emit("on_start") if dings_context.running else socketio.emit("on_exit")
         socketio.sleep(0.125)
-        if livedings.dirty:
-            emit_mididings_context()
-            livedings.dirty = False
+
 
 ''' OSC controls '''
 
 def _quit():
-    livedings.quit()
+    dings_context.quit()
 
 
 def _panic():
-    livedings.panic()
+    dings_context.panic()
 
 
 def _query():
-    livedings.query()
+    dings_context.query()
 
 
 def _restart():
-    livedings.restart()
+    dings_context.restart()
 
 
 def _next_subscene():
-    livedings.next_subscene()
+    dings_context.next_subscene()
 
 
 def _next_scene():
-    livedings.next_scene()
+    dings_context.next_scene()
 
 
 def _prev_subscene():
-    livedings.prev_subscene()
+    dings_context.prev_subscene()
 
 
 def _prev_scene():
-    livedings.prev_scene()
+    dings_context.prev_scene()
 
 
 def _switch_scene(id):
-    livedings.switch_scene(id)
+    dings_context.switch_scene(id)
 
 
 def _switch_subscene(id):
-    livedings.switch_subscene(id)
+    dings_context.switch_subscene(id)
 
 
 '''
@@ -281,4 +270,4 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5555)
+    socketio.run(app, host=configuration["host"], port=configuration["port"])

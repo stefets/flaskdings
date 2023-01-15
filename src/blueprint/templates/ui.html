@@ -112,7 +112,15 @@
             $('#mididings').html('<div class="bg-success">RUNNING</div>');
         });
 
-        socket.on('application_shutdown', function() {
+        socket.on('on_exit', function() {
+            $('#mididings').html('<div class="bg-danger">STOPPED</div>');
+        });
+
+        socket.on('on_start', function() {
+            $('#mididings').html('<div class="bg-success">RUNNING</div>');
+        });
+
+        socket.on('on_terminate', function() {
             socket.disconnect();
             $('#websockets').html('<div class="bg-danger">DISCONNECTED</div>');
             $('#mididings').html('<div class="bg-danger">STOPPED</div>');

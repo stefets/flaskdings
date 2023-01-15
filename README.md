@@ -1,9 +1,10 @@
 # flaskdings
-A simple and effective API and UI for MIDIDINGS
+A simple and effective API and UI for Mididings community version
+
 
 # Features
 ## A backend
-* An OSC server that communicate with MIDIDINGS
+* An OSC server that communicate with Mididings community version
 * Websockets layer
 * A REST API layer
 ## A frontend
@@ -12,14 +13,14 @@ A simple and effective API and UI for MIDIDINGS
 * <img src="/doc/flaskdings.png" />
 
 # Depedencies
-* mididings
+* mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
 * Flask
 * Flask-socketio
 * Blinker
 * eventlet
 
-# Support MIDIDINGS
-* Contributors and PR are welcome to improve flaskdings and keep MIDIDINGS ALIVE
+# Support Flaskdings
+* Contributors, suggestions and PR are welcome to improve Flaskdings
 
 # License
 All files in this repository are released under the terms of the GNU
@@ -28,7 +29,7 @@ either version 2 of the License, or (at your option) any later version.
 
 For more details, please read the LICENSE file.
 
-# Mididings ressources
-* https://www.github.com/mididings/mididings (New community fork!)
-* http://dsacre.github.io/mididings/doc/
+# Mididings community version ressources
+* https://www.github.com/mididings/mididings
+* https://mididings.github.io/mididings/
 * https://groups.google.com/g/mididings

@@ -2,12 +2,12 @@
 
 from flask import Blueprint, render_template, current_app
 
-ui_blueprint = Blueprint('ui_blueprint', __name__,
+frontend = Blueprint('frontend', __name__,
                          template_folder='templates',
                          url_prefix='/ui')
 
 
-@ui_blueprint.route("/")
+@frontend.route("/")
 def index():
-    ld = current_app.config['livedings']
-    return render_template('ui.html') if ld.scenes else render_template('no_ui.html')
+    context = current_app.config['dings_context']
+    return render_template('ui.html') if context.scenes else render_template('no_ui.html')
