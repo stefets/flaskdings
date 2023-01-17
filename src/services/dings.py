@@ -31,7 +31,6 @@ class OscContext:
         
         self.dirty = False
         self.running = False
-        self.is_exiting = False
 
         self.osc.query()
 
@@ -58,7 +57,6 @@ class OscContext:
 
     def quit(self):
         self.osc.quit()
-        self.on_exit()
 
     def switch_scene(self, value):
         self.osc.switch_scene(value)
@@ -66,7 +64,7 @@ class OscContext:
     def switch_subscene(self, value):
         self.osc.switch_subscene(value)
 
-    ''' OscServer callbacks '''
+    ''' LiveOSC callbacks '''
 
     def set_data_offset(self, data_offset):
         self.data_offset = data_offset
@@ -83,11 +81,14 @@ class OscContext:
         self.has_subscene = self.scenes[scene][1]
         self.subscene_name = self.scenes[scene][1][subscene-1] if self.has_subscene else "..."        
 
-        # This is the last OSC operation.
+        # This is the last OSC operation from /query
         self.dirty = True
+        self.running = True
 
     def on_start(self):
+        ''' Engine start '''
         self.running = True
 
     def on_exit(self):
+        ''' Engine stopped '''
         self.running = False

@@ -1,5 +1,6 @@
 # flaskdings
 A simple and effective API and UI for Mididings community version
+* <img src="/doc/flaskdings.png" />
 
 
 # Features
@@ -10,7 +11,7 @@ A simple and effective API and UI for Mididings community version
 ## A frontend
 * Provide a HTML5 frontend as an alternative to the livedings frontend
 * Use Websockets for near realtime refresh
-* <img src="/doc/flaskdings.png" />
+* <img src="/doc/flaskdings-vs-livedings.png" />
 
 # Depedencies
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)

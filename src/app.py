@@ -180,9 +180,11 @@ def sio_restart():
 def sio_panic():
     _panic()
 
+
 @socketio.event
 def sio_query():
     _query()
+
 
 @socketio.event
 def sio_quit():
@@ -202,7 +204,7 @@ def osc_observer_thread():
         socketio.sleep(0.125)
 
 
-''' OSC controls '''
+''' API calls  '''
 
 def _quit():
     dings_context.quit()
