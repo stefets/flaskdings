@@ -1,14 +1,19 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+
 '''
     This class is the equivalent of the mididings.live.livedings.LiveDings
 '''
-from .osc import OscServer
 
-class Context(object):
-    def __init__(self, options, signal):
 
-        self.osc = OscServer(
+import liblo
+from mididings.live.osc_control import LiveOSC
+
+
+class OscContext:
+    def __init__(self, options):
+
+        self.osc = LiveOSC(
             self, options["control_port"], options["listen_port"])
 
         self.osc.start()
@@ -24,8 +29,8 @@ class Context(object):
         self.data_offset = -1
         self.scenes = {}
         
-        self.signal = signal
         self.dirty = False
+        self.running = False
 
         self.osc.query()
 
@@ -52,7 +57,6 @@ class Context(object):
 
     def quit(self):
         self.osc.quit()
-        self.signal.send(self, terminate=True)
 
     def switch_scene(self, value):
         self.osc.switch_scene(value)
@@ -60,15 +64,13 @@ class Context(object):
     def switch_subscene(self, value):
         self.osc.switch_subscene(value)
 
-    ''' OscServer callbacks '''
+    ''' LiveOSC callbacks '''
 
     def set_data_offset(self, data_offset):
         self.data_offset = data_offset
 
-
     def set_scenes(self, value):
         self.scenes = value
-
 
     def set_current_scene(self, scene, subscene):
         self.current_scene = scene
@@ -79,6 +81,14 @@ class Context(object):
         self.has_subscene = self.scenes[scene][1]
         self.subscene_name = self.scenes[scene][1][subscene-1] if self.has_subscene else "..."        
 
-        # This is the last OSC operation.
-        # Signal the service to refresh clients
-        self.signal.send(self, refresh=True)
+        # This is the last OSC operation from /query
+        self.dirty = True
+        self.running = True
+
+    def on_start(self):
+        ''' Engine start '''
+        self.running = True
+
+    def on_exit(self):
+        ''' Engine stopped '''
+        self.running = False
