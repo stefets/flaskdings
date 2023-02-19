@@ -9,5 +9,5 @@ frontend = Blueprint('frontend', __name__,
 
 @frontend.route("/")
 def index():
-    context = current_app.config['dings_context']
+    context = current_app.config['live_context']
     return render_template('ui.html') if context.scenes else render_template('no_ui.html')

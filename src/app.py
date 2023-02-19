@@ -12,7 +12,7 @@ from flask import Flask, render_template
 from werkzeug.exceptions import HTTPException
 
 from blueprint.views import frontend
-from services.dings import OscContext
+from services.live import LiveContext
 
 
 app = Flask(__name__)
@@ -37,15 +37,15 @@ socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
 thread = None
 thread_lock = Lock()
 
-''' Mididings OSC context '''
-dings_context = None
+''' Mididings and OSC context '''
+live_context = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    dings_context = OscContext(
+    live_context = LiveContext(
         configuration["osc_server"])
 
 
 """  Bluebrint(s) """
-app.config['dings_context'] = dings_context
+app.config['live_context'] = live_context.scene_context
 app.register_blueprint(frontend)
 
 
@@ -117,15 +117,9 @@ def api_restart():
 
 
 def mididings_context_update():
-    dings_context.dirty = False
-    socketio.emit('mididings_context_update', {
-                  'current_scene': dings_context.current_scene,
-                  'current_subscene': dings_context.current_subscene,
-                  'scenes': dings_context.scenes,
-                  "scene_name" : dings_context.scene_name,
-                  "subscene_name" : dings_context.subscene_name,
-                  "has_subscene" : dings_context.has_subscene
-                  })
+    live_context.set_dirty(False)
+    socketio.emit('mididings_context_update',
+                  live_context.scene_context.payload)
 
 
 @socketio.event
@@ -192,58 +186,59 @@ def sio_quit():
     socketio.emit("on_terminate")
 
 
-
 ''' Mididings  '''
 
 
 def osc_observer_thread():
     while True:
-        if dings_context.dirty:
+        if live_context.is_dirty():
             mididings_context_update()
-        socketio.emit("on_start") if dings_context.running else socketio.emit("on_exit")
+        socketio.emit("on_start") if live_context.is_running(
+        ) else socketio.emit("on_exit")
         socketio.sleep(0.125)
 
 
 ''' API calls  '''
 
+
 def _quit():
-    dings_context.quit()
+    live_context.quit()
 
 
 def _panic():
-    dings_context.panic()
+    live_context.panic()
 
 
 def _query():
-    dings_context.query()
+    live_context.query()
 
 
 def _restart():
-    dings_context.restart()
+    live_context.restart()
 
 
 def _next_subscene():
-    dings_context.next_subscene()
+    live_context.next_subscene()
 
 
 def _next_scene():
-    dings_context.next_scene()
+    live_context.next_scene()
 
 
 def _prev_subscene():
-    dings_context.prev_subscene()
+    live_context.prev_subscene()
 
 
 def _prev_scene():
-    dings_context.prev_scene()
+    live_context.prev_scene()
 
 
 def _switch_scene(id):
-    dings_context.switch_scene(id)
+    live_context.switch_scene(id)
 
 
 def _switch_subscene(id):
-    dings_context.switch_subscene(id)
+    live_context.switch_subscene(id)
 
 
 '''
