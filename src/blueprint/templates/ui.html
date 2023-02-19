@@ -82,7 +82,8 @@
                     <input class="btn btn-block btn-info" type="button" id="prev_scene" value="Previous Scene">
                 </div>
                 <div class="col-md-3">
-                    <input class="btn btn-block btn-primary" type="button" id="prev_subscene" value="Previous Sub-Scene">
+                    <input class="btn btn-block btn-primary" type="button" id="prev_subscene"
+                        value="Previous Sub-Scene">
                 </div>
                 <div class="col-md-3">
                     <input class="btn btn-block btn-primary" type="button" id="next_subscene" value="Next Sub-Scene">
@@ -99,151 +100,155 @@
 
 {% endblock body %} {% block websockets %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js" integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
+    integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
+    crossorigin="anonymous"></script>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         var socket = io()
 
-        socket.on('connect', function() {
+        socket.on('connect', function () {
             socket.emit('sio_get_mididings_context');
             $('#websockets').html('<div class="bg-success">ONLINE</div>');
             $('#mididings').html('<div class="bg-success">RUNNING</div>');
         });
 
-        socket.on('on_exit', function() {
+        socket.on('on_exit', function () {
             $('#mididings').html('<div class="bg-danger">STOPPED</div>');
         });
 
-        socket.on('on_start', function() {
+        socket.on('on_start', function () {
             $('#mididings').html('<div class="bg-success">RUNNING</div>');
         });
 
-        socket.on('on_terminate', function() {
+        socket.on('on_terminate', function () {
             socket.disconnect();
             $('#websockets').html('<div class="bg-danger">DISCONNECTED</div>');
             $('#mididings').html('<div class="bg-danger">STOPPED</div>');
         });
 
-        socket.on('mididings_context_update', function(ld) {
-
-            $('#current_scene').text(ld.current_scene);
-            $('#current_scene_name').text(ld.scene_name);
-
-            $('#current_subscene').text(ld.current_subscene);
-            $('#current_subscene_name').text(ld.subscene_name);
-
+        socket.on('mididings_context_update', function (context) {
+            //
             // Redraw the content section
-            $('#scenes').text('');
-            $('#subscenes').text('');
-
-            var html = ""
-            var cpt_s = 0;
+            //                
+            var count = 0;
+            var content = "";
+            var subscenes = [];
 
             // Scenes
-            for (let scene_id in ld.scenes) {
+            for (let index in context.items) {
 
-                if (cpt_s % 2 == 0)
-                    html += "<div class='row mt-1 mb-1'>";
+                var scene = context.items[index];
+
+                if (count % 2 == 0)
+                    content += "<div class='row mt-1 mb-1'>";
 
                 // Button style
                 var button_class = "'btn btn-block switch_scene ";
-                if (parseInt(scene_id) == ld.current_scene)
+                if (scene.current)
+                {
+                    $('#current_scene').text(scene.id);
+                    $('#current_scene_name').text(scene.name);
                     button_class += "btn-light'";
+                    subscenes = scene.subscenes;
+                }
                 else
                     button_class += "btn-dark'";
 
-                html += "<div class='col-md-6'>";
-                html += "<input class=" + button_class + " type='button' name='" + scene_id + "' value='" + ld.scenes[scene_id][0] + "'>"
-                html += "</div>";
+                content += "<div class='col-md-6'>";
+                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "</div>";
 
-                cpt_s++;
+                count++;
 
-                if (cpt_s % 2 == 0)
-                    html += "</div>";
+                if (count % 2 == 0)
+                    content += "</div>";
             }
-            $("#scenes").append(html);
+            $('#scenes').text("");
+            $("#scenes").append(content);
 
 
             // Subscenes 
-            if (ld.has_subscene) {
+            count = 0;
+            content = "";
 
-                cpt_s = 0;
-                html = "";
+            $('#current_subscene_name').text("...");
+            for (let index in subscenes) {
 
-                for (let subscene_index in ld.scenes[ld.current_scene][1]) {
+                var scene = subscenes[index];
 
-                    if (cpt_s % 4 == 0)
-                        html += "<div class='row mt-1 mb-1'>";
+                if (count % 4 == 0)
+                    content += "<div class='row mt-1 mb-1'>";
 
-                    var subscene_id = parseInt(subscene_index) + 1;
-
-                    // Button style
-                    var button_class = "'btn btn-block switch_subscene ";
-                    if (parseInt(subscene_id) == ld.current_subscene)
-                        button_class += "btn-light'";
-                    else
-                        button_class += "btn-secondary'";
-
-                    html += "<div class='col-md-3'>";
-                    html += "<input class=" + button_class + " type='button' name='" + subscene_id.toString() + "' value='" + ld.scenes[ld.current_scene][1][subscene_index] + "'>"
-                    html += "</div>";
-
-                    cpt_s++;
-
-                    if (cpt_s % 4 == 0)
-                        html += "</div>";
+                // Button style
+                var button_class = "'btn btn-block switch_subscene ";
+                if (scene.current) {
+                    button_class += "btn-light'";
+                    $('#current_subscene').text(scene.id);
+                    $('#current_subscene_name').text(scene.name);
                 }
-                $('#subscenes').append(html);
+                else
+                    button_class += "btn-secondary'";
 
+                content += "<div class='col-md-3'>";
+                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "</div>";
+
+                count++;
+
+                if (count % 4 == 0)
+                    content += "</div>";
             }
+            $('#subscenes').text("");
+            $('#subscenes').append(content);
 
         });
 
         // Scene navigation delegate
-        $("#scenes").delegate("input.switch_scene", "click", function(event) {
+        $("#scenes").delegate("input.switch_scene", "click", function (event) {
             return emit('sio_switch_scene', {
                 id: $(this).attr('name')
             });
         });
 
         // Sub-Scene navigation delegate
-        $("#subscenes").delegate("input.switch_subscene", "click", function(event) {
+        $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
             return emit('sio_switch_subscene', {
                 id: $(this).attr('name')
             });
         });
 
-        $('#next_scene').click(function(event) {
+        $('#next_scene').click(function (event) {
             return emit('sio_next_scene');
         });
 
-        $('#prev_scene').click(function(event) {
+        $('#prev_scene').click(function (event) {
             return emit('sio_prev_scene');
         });
 
-        $('#next_subscene').click(function(event) {
+        $('#next_subscene').click(function (event) {
             return emit('sio_next_subscene');
         });
 
-        $('#prev_subscene').click(function(event) {
+        $('#prev_subscene').click(function (event) {
             return emit('sio_prev_subscene');
         });
 
-        $('#restart').click(function(event) {
+        $('#restart').click(function (event) {
             return emit('sio_restart');
         });
 
-        $('#panic').click(function(event) {
+        $('#panic').click(function (event) {
             return emit('sio_panic');
         });
 
-        $('#query').click(function(event) {
+        $('#query').click(function (event) {
             return emit('sio_query');
         });
 
-        $('#quit').click(function(event) {
+        $('#quit').click(function (event) {
             return emit('sio_quit');
         });
 
