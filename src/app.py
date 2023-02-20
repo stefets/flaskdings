@@ -54,60 +54,60 @@ app.register_blueprint(frontend)
 '''
 
 
-@app.route("/")
+@app.get("/")
 def index():
     return render_template('index.html')
 
 
-@app.route("/next_scene")
+@app.get("/next_scene")
 def api_next_scene():
     _next_scene()
     return '', 204
 
 
-@app.route("/prev_scene")
+@app.get("/prev_scene")
 def api_prev_scene():
     _prev_scene()
     return '', 204
 
 
-@app.route("/next_subscene")
+@app.get("/next_subscene")
 def api_next_subscene():
     _next_subscene()
     return '', 204
 
 
-@app.route("/prev_subscene")
+@app.get("/prev_subscene")
 def api_prev_subscene():
     _prev_subscene()
     return '', 204
 
 
-@app.route("/switch_scene/<int:id>")
+@app.get("/switch_scene/<int:id>")
 def api_switch_scene(id):
     _switch_scene(id)
     return '', 204
 
 
-@app.route("/switch_subscene/<int:id>")
+@app.get("/switch_subscene/<int:id>")
 def api_switch_subscene(id):
     _switch_subscene(id)
     return '', 204
 
 
-@app.route("/quit")
+@app.get("/quit")
 def api_quit():
     _quit()
     return '', 204
 
 
-@app.route("/panic")
+@app.get("/panic")
 def api_panic():
     _panic()
     return '', 204
 
 
-@app.route("/restart")
+@app.get("/restart")
 def api_restart():
     _restart()
     return '', 204
