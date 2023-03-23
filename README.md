@@ -12,12 +12,9 @@
 
 # Dependencies (see requirements.txt)
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
-* Flask
-* Flask-socketio
-* eventlet
 
 # Support Flaskdings
-* Contributors, suggestions and PR are welcome to improve Flaskdings and Mididings
+* Contributors, suggestions and PR are welcome to improve FlaskDings and mididings
 
 # License
 All files in this repository are released under the terms of the GNU

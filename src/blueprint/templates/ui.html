@@ -98,11 +98,9 @@
 
 </div>
 
-{% endblock body %} {% block websockets %}
+{% endblock body %} 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"
-    integrity="sha512-nYuHvSAhY5lFZ4ixSViOwsEKFvlxHMU2NHts1ILuJgOS6ptUmAGt/0i5czIgMOahKZ6JN84YFDA+mCdky7dD8A=="
-    crossorigin="anonymous"></script>
+{% block websockets %}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
@@ -147,8 +145,7 @@
 
                 // Button style
                 var button_class = "'btn btn-block switch_scene ";
-                if (scene.current)
-                {
+                if (scene.current) {
                     $('#current_scene').text(scene.id);
                     $('#current_scene_name').text(scene.name);
                     button_class += "btn-light'";

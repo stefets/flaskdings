@@ -54,62 +54,62 @@ app.register_blueprint(frontend)
 '''
 
 
-@app.route("/")
+@app.get("/")
 def index():
     return render_template('index.html')
 
 
-@app.route("/next_scene")
+@app.get("/next_scene")
 def api_next_scene():
-    _next_scene()
+    next_scene()
     return '', 204
 
 
-@app.route("/prev_scene")
+@app.get("/prev_scene")
 def api_prev_scene():
-    _prev_scene()
+    prev_scene()
     return '', 204
 
 
-@app.route("/next_subscene")
+@app.get("/next_subscene")
 def api_next_subscene():
-    _next_subscene()
+    next_subscene()
     return '', 204
 
 
-@app.route("/prev_subscene")
+@app.get("/prev_subscene")
 def api_prev_subscene():
-    _prev_subscene()
+    prev_subscene()
     return '', 204
 
 
-@app.route("/switch_scene/<int:id>")
+@app.get("/switch_scene/<int:id>")
 def api_switch_scene(id):
-    _switch_scene(id)
+    switch_scene(id)
     return '', 204
 
 
-@app.route("/switch_subscene/<int:id>")
+@app.get("/switch_subscene/<int:id>")
 def api_switch_subscene(id):
-    _switch_subscene(id)
+    switch_subscene(id)
     return '', 204
 
 
-@app.route("/quit")
+@app.get("/quit")
 def api_quit():
-    _quit()
+    quit()
     return '', 204
 
 
-@app.route("/panic")
+@app.get("/panic")
 def api_panic():
-    _panic()
+    panic()
     return '', 204
 
 
-@app.route("/restart")
+@app.get("/restart")
 def api_restart():
-    _restart()
+    restart()
     return '', 204
 
 
@@ -137,52 +137,52 @@ def sio_get_mididings_context():
 
 @socketio.event
 def sio_switch_scene(data):
-    _switch_scene(int(data['id']))
+    switch_scene(int(data['id']))
 
 
 @socketio.event
 def sio_switch_subscene(data):
-    _switch_subscene(int(data['id']))
+    switch_subscene(int(data['id']))
 
 
 @socketio.event
 def sio_next_scene():
-    _next_scene()
+    next_scene()
 
 
 @socketio.event
 def sio_prev_scene():
-    _prev_scene()
+    prev_scene()
 
 
 @socketio.event
 def sio_prev_subscene():
-    _prev_subscene()
+    prev_subscene()
 
 
 @socketio.event
 def sio_next_subscene():
-    _next_subscene()
+    next_subscene()
 
 
 @socketio.event
 def sio_restart():
-    _restart()
+    restart()
 
 
 @socketio.event
 def sio_panic():
-    _panic()
+    panic()
 
 
 @socketio.event
 def sio_query():
-    _query()
+    query()
 
 
 @socketio.event
 def sio_quit():
-    _quit()
+    quit()
     socketio.emit("on_terminate")
 
 
@@ -201,43 +201,43 @@ def osc_observer_thread():
 ''' API calls  '''
 
 
-def _quit():
+def quit():
     live_context.quit()
 
 
-def _panic():
+def panic():
     live_context.panic()
 
 
-def _query():
+def query():
     live_context.query()
 
 
-def _restart():
+def restart():
     live_context.restart()
 
 
-def _next_subscene():
+def next_subscene():
     live_context.next_subscene()
 
 
-def _next_scene():
+def next_scene():
     live_context.next_scene()
 
 
-def _prev_subscene():
+def prev_subscene():
     live_context.prev_subscene()
 
 
-def _prev_scene():
+def prev_scene():
     live_context.prev_scene()
 
 
-def _switch_scene(id):
+def switch_scene(id):
     live_context.switch_scene(id)
 
 
-def _switch_subscene(id):
+def switch_subscene(id):
     live_context.switch_subscene(id)
 
 
