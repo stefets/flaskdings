@@ -54,23 +54,30 @@
             <!-- Console header -->
 
             <div class="row">
-                <div class="bg-secondary col-md-6 text-center">
+                <div class="bg-secondary col-md-4 text-center">
                     <div class="bg-dark">
-                        MIDIDINGS Engine
+                        Mididings
                     </div>
                 </div>
-                <div class="bg-secondary col-md-6 text-center">
+                <div class="bg-secondary col-md-4 text-center">
                     <div class="bg-dark">
-                        Websockets
+                        Flask Server
+                    </div>
+                </div>
+                <div class="bg-secondary col-md-4 text-center">
+                    <div class="bg-dark">
+                        This client
                     </div>
                 </div>
             </div>
 
-            <!-- Console status -->
+            <!-- Services state -->
             <div id="console" class="row">
-                <div id="mididings" class="bg-secondary col-md-6 text-center">
+                <div id="mididings-state" class="bg-secondary col-md-4 text-center">
                 </div>
-                <div id="websockets" class="bg-secondary col-md-6 text-center">
+                <div id="server-state" class="bg-secondary col-md-4 text-center">
+                </div>
+                <div id="client-state" class="bg-secondary col-md-4 text-center">
                 </div>
             </div>
         </div>
@@ -109,22 +116,23 @@
 
         socket.on('connect', function () {
             socket.emit('sio_get_mididings_context');
-            $('#websockets').html('<div class="bg-success">ONLINE</div>');
-            $('#mididings').html('<div class="bg-success">RUNNING</div>');
+            $('#client-state').html('<div class="bg-success">ONLINE</div>');
+            $('#mididings-state').html('<div class="bg-success">ONLINE</div>');
+            $('#server-state').html('<div class="bg-success">ONLINE</div>');
         });
 
         socket.on('on_exit', function () {
-            $('#mididings').html('<div class="bg-danger">STOPPED</div>');
+            $('#mididings-state').html('<div class="bg-danger">OFFLINE</div>');
         });
 
         socket.on('on_start', function () {
-            $('#mididings').html('<div class="bg-success">RUNNING</div>');
+            $('#mididings-state').html('<div class="bg-success">ONLINE</div>');
         });
 
         socket.on('on_terminate', function () {
             socket.disconnect();
-            $('#websockets').html('<div class="bg-danger">DISCONNECTED</div>');
-            $('#mididings').html('<div class="bg-danger">STOPPED</div>');
+            $('#client-state').html('<div class="bg-danger">OFFLINE</div>');
+            $('#mididings-state').html('<div class="bg-danger">OFFLINE</div>');
         });
 
         socket.on('mididings_context_update', function (context) {
