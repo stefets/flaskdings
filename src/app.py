@@ -15,7 +15,7 @@ from blueprint.views import frontend
 from services.live import LiveContext
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 if not app.debug:
     import eventlet
