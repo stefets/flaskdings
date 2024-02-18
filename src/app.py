@@ -198,7 +198,7 @@ def osc_observer_thread():
         socketio.sleep(0.125)
 
 
-''' API calls  '''
+''' Endpoints  '''
 
 
 def quit():

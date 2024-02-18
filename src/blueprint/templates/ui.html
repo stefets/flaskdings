@@ -3,11 +3,11 @@
 <div class="container">
 
     <!-- Header -->
-    <div class="row mb-1">
+    <div class="row mb-1 mt-1">
 
         <div class="col-md-4 bg-secondary">
 
-            <div class="row">
+            <div class="row mt-1">
                 <div class="col-md-3">
                     <input class="btn btn-warning" type="button" id="restart" value="Restart">
                 </div>
@@ -28,7 +28,7 @@
                 <div class="col-md-10">
                     <h3>
                         <!-- Fil d'ariane -->
-                        / <span id="current_scene_name"></span> / <span id="current_subscene_name"></span>
+                        /<span id="current_scene_name"></span>/<span id="current_subscene_name"></span>
                     </h3>
                 </div>
                 <div class="col-md-2">
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="row mt-2">
+    <div class="row mt-2 ">
 
         <!-- Application status console -->
         <div class="col-md-4 bg-secondary">
@@ -84,7 +84,7 @@
 
         <!-- Scene and Sub-Scene navigation -->
         <div class="col-md-8 bg-dark">
-            <div class="row">
+            <div class="row mt-1">
                 <div class="col-md-3">
                     <input class="btn btn-block btn-info" type="button" id="prev_scene" value="Previous Scene">
                 </div>
@@ -143,12 +143,18 @@
             var content = "";
             var subscenes = [];
 
+            // Reset content
+            $("#scenes").text("");                  // Clear scene content 
+            $('#subscenes').text("");               // Clear subscenes content
+            $('#current_subscene_name').text(".");  // Default value
+            $('#current_subscene').text("x");       // Default value
+            
             // Scenes
             for (let index in context.items) {
 
                 var scene = context.items[index];
 
-                if (count % 2 == 0)
+                if (count % 2 === 0)
                     content += "<div class='row mt-1 mb-1'>";
 
                 // Button style
@@ -168,23 +174,22 @@
 
                 count++;
 
-                if (count % 2 == 0)
+                if (count % 2 === 0)
                     content += "</div>";
             }
-            $('#scenes').text("");
             $("#scenes").append(content);
 
-
             // Subscenes 
+            if (subscenes.length === 0) 
+                return;
+
             count = 0;
             content = "";
-
-            $('#current_subscene_name').text("...");
             for (let index in subscenes) {
 
                 var scene = subscenes[index];
 
-                if (count % 4 == 0)
+                if (count % 4 === 0)
                     content += "<div class='row mt-1 mb-1'>";
 
                 // Button style
@@ -203,12 +208,10 @@
 
                 count++;
 
-                if (count % 4 == 0)
+                if (count % 4 === 0)
                     content += "</div>";
             }
-            $('#subscenes').text("");
             $('#subscenes').append(content);
-
         });
 
         // Scene navigation delegate
