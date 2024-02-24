@@ -8,7 +8,7 @@ import json
 from threading import Lock
 
 from flask_socketio import SocketIO
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
 from blueprint.views import frontend
@@ -37,6 +37,7 @@ socketio = SocketIO(app, logger=app.debug, engineio_logger=app.debug)
 thread = None
 thread_lock = Lock()
 
+
 ''' Mididings and OSC context '''
 live_context = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -50,7 +51,7 @@ app.register_blueprint(frontend)
 
 
 '''
-    Api routes
+    REST API endpoints
 '''
 
 
@@ -58,63 +59,43 @@ app.register_blueprint(frontend)
 def index():
     return render_template('index.html')
 
-
-@app.get("/next_scene")
-def api_next_scene():
-    next_scene()
+@app.get("/quit", endpoint="quit")
+@app.get("/panic", endpoint="panic")
+@app.get("/restart", endpoint="restart")
+@app.get("/prev_scene", endpoint="prev_scene")
+@app.get("/next_scene", endpoint="next_scene")
+@app.get("/next_subscene", endpoint="next_subscene")
+@app.get("/prev_subscene", endpoint="prev_subscene")
+@app.get("/switch_scene/<int:id>", endpoint="switch_scene")
+@app.get("/switch_subscene/<int:id>", endpoint="switch_subscene")
+def on_navigate(id=None):
+    delegates[request.endpoint]() if id is None else delegates[request.endpoint](int(id))
     return '', 204
 
 
-@app.get("/prev_scene")
-def api_prev_scene():
-    prev_scene()
-    return '', 204
+''' SocketIO events '''
 
 
-@app.get("/next_subscene")
-def api_next_subscene():
-    next_subscene()
-    return '', 204
+@socketio.on('connect')
+def on_connect():
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(osc_observer_thread)
+
+@socketio.on('mididings')
+def on_handler(payload):
+    delegates[payload["command"]]() if not "id" in payload else delegates[payload["command"]](int(payload["id"]))
+
+@socketio.on('action', namespace="/main")
+def on_action_handler(payload):
+    global_delegates[payload["command"]]() 
 
 
-@app.get("/prev_subscene")
-def api_prev_subscene():
-    prev_subscene()
-    return '', 204
+''' Methods  '''
 
-
-@app.get("/switch_scene/<int:id>")
-def api_switch_scene(id):
-    switch_scene(id)
-    return '', 204
-
-
-@app.get("/switch_subscene/<int:id>")
-def api_switch_subscene(id):
-    switch_subscene(id)
-    return '', 204
-
-
-@app.get("/quit")
-def api_quit():
-    quit()
-    return '', 204
-
-
-@app.get("/panic")
-def api_panic():
-    panic()
-    return '', 204
-
-
-@app.get("/restart")
-def api_restart():
-    restart()
-    return '', 204
-
-
-''' Websockets event routes '''
-
+def on_quit():
+    socketio.emit("on_terminate")
 
 def mididings_context_update():
     live_context.set_dirty(False)
@@ -122,71 +103,8 @@ def mididings_context_update():
                   live_context.scene_context.payload)
 
 
-@socketio.event
-def connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(osc_observer_thread)
-
-
-@socketio.event
-def sio_get_mididings_context():
+def get_mididings_context():
     mididings_context_update()
-
-
-@socketio.event
-def sio_switch_scene(data):
-    switch_scene(int(data['id']))
-
-
-@socketio.event
-def sio_switch_subscene(data):
-    switch_subscene(int(data['id']))
-
-
-@socketio.event
-def sio_next_scene():
-    next_scene()
-
-
-@socketio.event
-def sio_prev_scene():
-    prev_scene()
-
-
-@socketio.event
-def sio_prev_subscene():
-    prev_subscene()
-
-
-@socketio.event
-def sio_next_subscene():
-    next_subscene()
-
-
-@socketio.event
-def sio_restart():
-    restart()
-
-
-@socketio.event
-def sio_panic():
-    panic()
-
-
-@socketio.event
-def sio_query():
-    query()
-
-
-@socketio.event
-def sio_quit():
-    quit()
-    socketio.emit("on_terminate")
-
-
-''' Mididings  '''
 
 
 def osc_observer_thread():
@@ -198,48 +116,30 @@ def osc_observer_thread():
         socketio.sleep(0.125)
 
 
-''' Endpoints  '''
+'''
+Dict of methods
+'''
+delegates = {
+    "quit" : live_context.quit,
+    "panic" : live_context.panic,
+    "query" : live_context.query,
+    "restart" : live_context.restart,
+    "next_scene" : live_context.next_scene,
+    "prev_scene" : live_context.prev_scene,
+    "switch_scene" : live_context.switch_scene,
+    "next_subscene" : live_context.next_subscene,
+    "prev_subscene" : live_context.prev_subscene,
+    "switch_subscene" : live_context.switch_subscene,
+    "get_mididings_context" : get_mididings_context,
+    "mididings_context_update" : mididings_context_update
+}
 
 
-def quit():
-    live_context.quit()
-
-
-def panic():
-    live_context.panic()
-
-
-def query():
-    live_context.query()
-
-
-def restart():
-    live_context.restart()
-
-
-def next_subscene():
-    live_context.next_subscene()
-
-
-def next_scene():
-    live_context.next_scene()
-
-
-def prev_subscene():
-    live_context.prev_subscene()
-
-
-def prev_scene():
-    live_context.prev_scene()
-
-
-def switch_scene(id):
-    live_context.switch_scene(id)
-
-
-def switch_subscene(id):
-    live_context.switch_subscene(id)
-
+global_delegates = {
+    #"on_connect": on_connect,
+    #"on_refresh": on_refresh,
+    "quit" : on_quit,
+}
 
 '''
 Error Handling
@@ -267,4 +167,5 @@ def handle_exception(e):
 
 
 if __name__ == "__main__":
+    print(f"Flaskdings running on port {configuration['port']}")
     socketio.run(app, host=configuration["host"], port=configuration["port"])
