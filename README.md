@@ -5,15 +5,15 @@
 # Features
 ## Backend
 * An instance of mididings.LiveOSC server
-* Websockets routes and near realtime refresh
-* Standard REST API routes
+* Websocket endpoints allow multiple clients and realtime refresh
+* REST endpoints
 ## A modern HTML5 frontend as an alternative to the livedings UI
 <img src="/doc/flaskdings-vs-livedings.png" />
 
 # Dependencies (see requirements.txt)
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
 
-# Support Flaskdings
+# Support FlaskDings
 * Contributors, suggestions and PR are welcome to improve FlaskDings and mididings
 
 # License
