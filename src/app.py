@@ -11,8 +11,8 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from blueprint.views import frontend
-from services.live import LiveContext
+from blueprints.scene import _presenter
+from logic.base import MainLogic
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -41,13 +41,13 @@ thread_lock = Lock()
 ''' Mididings and OSC context '''
 live_context = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    live_context = LiveContext(
+    live_context = MainLogic(
         configuration["osc_server"])
 
 
 """  Bluebrint(s) """
-app.config['live_context'] = live_context.scene_context
-app.register_blueprint(frontend)
+app.config['live_context'] = live_context.scene_logic
+app.register_blueprint(_presenter)
 
 
 '''
@@ -100,7 +100,7 @@ def on_quit():
 def mididings_context_update():
     live_context.set_dirty(False)
     socketio.emit('mididings_context_update',
-                  live_context.scene_context.payload)
+                  live_context.scene_logic.payload)
 
 
 def get_mididings_context():
