@@ -1,14 +1,13 @@
 # FlaskDings
-## An API and UI for the mididings community version
+## An UI and API for mididings, the community version
+* It allows direct navigation through scenes and subscenes and the others commands supported by the mididings's OSC feature
 <img src="/assets/flaskdings-20240226.png" />
 
-# Features
-## A Flask backend 
-* A REST API
-* A Socket.IO instance that allow multiple clients and realtime refresh
+# Backend
+* Flask
 * A mididings.LiveOSC server instance
-## A Bootstrap frontend providing an alternative to the livedings UI
-<img src="/assets/flaskdings-vs-livedings.png" />
+* Flask Socket IO, allow multiple clients and realtime refresh when navigation change.
+* Expose standard REST endpoints
 
 # Dependencies
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
