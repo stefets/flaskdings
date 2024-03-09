@@ -1,17 +1,21 @@
 # FlaskDings
-## A simple and effective API and UI for Mididings community version
+## An API and UI for the mididings community version
 <img src="/assets/flaskdings-20240226.png" />
 
 # Features
 ## Backend
-* An instance of mididings.LiveOSC server
-* Websocket endpoints allow multiple clients and realtime refresh
-* REST endpoints
-## A modern HTML5 frontend as an alternative to the livedings UI
+* A REST API
+* A Socket.IO instance that allow multiple clients and realtime refresh
+* A mididings.LiveOSC server instance
+## A Bootstrap frontend providing an alternative to the livedings UI
 <img src="/assets/flaskdings-vs-livedings.png" />
 
-# Dependencies (see requirements.txt)
+# Dependencies
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
+* Flask
+* PyLiblo
+* liblo
+* Flask SocketIO
 
 # Support FlaskDings
 * Contributors, suggestions and PR are welcome to improve FlaskDings and mididings
