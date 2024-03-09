@@ -3,7 +3,7 @@
 <img src="/assets/flaskdings-20240226.png" />
 
 # Features
-## Backend
+## A Flask backend 
 * A REST API
 * A Socket.IO instance that allow multiple clients and realtime refresh
 * A mididings.LiveOSC server instance
