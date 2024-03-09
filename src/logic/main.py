@@ -8,14 +8,14 @@
 '''
 
 
-from .osc import OscLogic
-from .scene import SceneLogic
+from .osc import OscContext
+from .scene import SceneContext
 
 
-class MainLogic:
-    def __init__(self, options) -> None:
-        self.scene_logic = SceneLogic()
-        self.osc_logic = OscLogic(options, self.scene_logic)
+class AppContext:
+    def __init__(self, config) -> None:
+        self.scene_logic = SceneContext()
+        self.osc_logic = OscContext(config, self.scene_logic)
 
     def is_dirty(self):
         return self.osc_logic.dirty

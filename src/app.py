@@ -12,7 +12,7 @@ from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
 from blueprints.scene import _presenter
-from logic.base import MainLogic
+from logic.main import AppContext
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -41,7 +41,7 @@ thread_lock = Lock()
 ''' Mididings and OSC context '''
 live_context = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    live_context = MainLogic(
+    live_context = AppContext(
         configuration["osc_server"])
 
 

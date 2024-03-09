@@ -12,11 +12,11 @@ import liblo
 from mididings.live.osc_control import LiveOSC
 
 
-class OscLogic:
-    def __init__(self, options, scene_context):
+class OscContext:
+    def __init__(self, config, scene_context):
 
         self.osc = LiveOSC(
-            self, options["control_port"], options["listen_port"])
+            self, config["control_port"], config["listen_port"])
 
         self.dirty = False
         self.running = False

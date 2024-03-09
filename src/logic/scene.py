@@ -9,7 +9,7 @@
 '''
 
 
-class SceneLogic:
+class SceneContext:
     def __init__(self) -> None:
         self.data_offset = -1
         self.scenes = []
