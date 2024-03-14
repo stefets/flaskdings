@@ -37,9 +37,9 @@ thread_lock = Lock()
 
 
 ''' Mididings and OSC context '''
-live_context = None
+appContext = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    live_context = AppContext(
+    appContext = AppContext(
         configuration["osc_server"])
 
 
@@ -55,7 +55,7 @@ def index():
 
 @app.get("/ui")
 def presentation():
-    return render_template('ui.html') if live_context.scene_logic.scenes else render_template('no_context.html')
+    return render_template('ui.html') if appContext.scene_logic.scenes else render_template('no_context.html')
 
 
 @app.get("/quit", endpoint="quit")
@@ -97,9 +97,9 @@ def on_quit():
     socketio.emit("on_terminate")
 
 def mididings_context_update():
-    live_context.set_dirty(False)
+    appContext.set_dirty(False)
     socketio.emit('mididings_context_update',
-                  live_context.scene_logic.payload)
+                  appContext.scene_logic.payload)
 
 
 def get_mididings_context():
@@ -108,9 +108,9 @@ def get_mididings_context():
 
 def osc_observer_thread():
     while True:
-        if live_context.is_dirty():
+        if appContext.is_dirty():
             mididings_context_update()
-        socketio.emit("on_start") if live_context.is_running(
+        socketio.emit("on_start") if appContext.is_running(
         ) else socketio.emit("on_exit")
         socketio.sleep(0.125)
 
@@ -119,16 +119,16 @@ def osc_observer_thread():
 Dict of methods
 '''
 delegates = {
-    "quit" : live_context.quit,
-    "panic" : live_context.panic,
-    "query" : live_context.query,
-    "restart" : live_context.restart,
-    "next_scene" : live_context.next_scene,
-    "prev_scene" : live_context.prev_scene,
-    "switch_scene" : live_context.switch_scene,
-    "next_subscene" : live_context.next_subscene,
-    "prev_subscene" : live_context.prev_subscene,
-    "switch_subscene" : live_context.switch_subscene,
+    "quit" : appContext.quit,
+    "panic" : appContext.panic,
+    "query" : appContext.query,
+    "restart" : appContext.restart,
+    "next_scene" : appContext.next_scene,
+    "prev_scene" : appContext.prev_scene,
+    "switch_scene" : appContext.switch_scene,
+    "next_subscene" : appContext.next_subscene,
+    "prev_subscene" : appContext.prev_subscene,
+    "switch_subscene" : appContext.switch_subscene,
     "get_mididings_context" : get_mididings_context,
     "mididings_context_update" : mididings_context_update
 }
