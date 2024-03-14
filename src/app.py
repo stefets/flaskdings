@@ -48,14 +48,12 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 '''
 
 
-@app.get("/")
+@app.get("/", endpoint="home")
+@app.get("/ui/", endpoint="view")
 def index():
-    return render_template('index.html')
-
-
-@app.get("/ui")
-def presentation():
-    return render_template('ui.html') if appContext.scene_logic.scenes else render_template('no_context.html')
+    return \
+    render_template('index.html') if request.endpoint == "home" else \
+    render_template('ui.html') if appContext.scene_logic.scenes else render_template('no_context.html')
 
 
 @app.get("/quit", endpoint="quit")
