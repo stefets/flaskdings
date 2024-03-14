@@ -11,7 +11,7 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from logic.main import AppContext
+from logic.conductor import ContextManager
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -39,7 +39,7 @@ thread_lock = Lock()
 ''' Mididings and OSC context '''
 appContext = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    appContext = AppContext(
+    appContext = ContextManager(
         configuration["osc_server"])
 
 

@@ -12,7 +12,7 @@ from .osc import OscContext
 from .scene import SceneContext
 
 
-class AppContext:
+class ContextManager:
     def __init__(self, config) -> None:
         self.scene_context = SceneContext()
         self.osc_context = OscContext(config, self.scene_context)
