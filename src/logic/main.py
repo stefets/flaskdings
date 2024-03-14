@@ -14,45 +14,45 @@ from .scene import SceneContext
 
 class AppContext:
     def __init__(self, config) -> None:
-        self.scene_logic = SceneContext()
-        self.osc_logic = OscContext(config, self.scene_logic)
+        self.scene_context = SceneContext()
+        self.osc_context = OscContext(config, self.scene_context)
 
     def is_dirty(self):
-        return self.osc_logic.dirty
+        return self.osc_context.dirty
 
     def set_dirty(self, value):
-        self.osc_logic.dirty = value
+        self.osc_context.dirty = value
 
     def is_running(self):
-        return self.osc_logic.running
+        return self.osc_context.running
 
     def next_scene(self):
-        self.osc_logic.osc.next_scene()
+        self.osc_context.osc.next_scene()
 
     def next_subscene(self):
-        self.osc_logic.osc.next_subscene()
+        self.osc_context.osc.next_subscene()
 
     def prev_scene(self):
-        self.osc_logic.osc.prev_scene()
+        self.osc_context.osc.prev_scene()
 
     def prev_subscene(self):
-        self.osc_logic.osc.prev_subscene()
+        self.osc_context.osc.prev_subscene()
 
     def panic(self):
-        self.osc_logic.osc.panic()
+        self.osc_context.osc.panic()
 
     def restart(self):
-        self.osc_logic.osc.restart()
+        self.osc_context.osc.restart()
 
     def query(self):
-        self.osc_logic.osc.query()
+        self.osc_context.osc.query()
 
     def quit(self):
-        self.osc_logic.osc.quit()
+        self.osc_context.osc.quit()
 
     def switch_scene(self, value):
-        self.osc_logic.osc.switch_scene(value)
+        self.osc_context.osc.switch_scene(value)
 
     def switch_subscene(self, value):
-        self.osc_logic.osc.switch_subscene(value)
+        self.osc_context.osc.switch_subscene(value)
 

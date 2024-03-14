@@ -53,7 +53,7 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 def index():
     return \
     render_template('index.html') if request.endpoint == "home" else \
-    render_template('ui.html') if appContext.scene_logic.scenes else render_template('no_context.html')
+    render_template('ui.html') if appContext.scene_context.scenes else render_template('no_context.html')
 
 
 @app.get("/quit", endpoint="quit")
@@ -97,7 +97,7 @@ def on_quit():
 def mididings_context_update():
     appContext.set_dirty(False)
     socketio.emit('mididings_context_update',
-                  appContext.scene_logic.payload)
+                  appContext.scene_context.payload)
 
 
 def get_mididings_context():
