@@ -23,11 +23,11 @@ class SceneContext:
         ''' Dictionary (int scene_id: tuple(str scene_name, list subscenes))'''
         self.scenes = []
         for key, scene_item in scenes.items():
-            scene = Scene(key, scene_item[0])
+            scene = SceneDto(key, scene_item[0])
             index = 0
             for subscene_name in scene_item[1]:
                 index += 1
-                scene.subscenes.append(SubScene(index, subscene_name))
+                scene.subscenes.append(SubSceneDto(index, subscene_name))
 
             self.scenes.append(scene)
 
@@ -56,18 +56,19 @@ class SceneContext:
 
         self.payload = {"items": items}
 
-class SceneBase:
+
+class SceneBaseDto:
     def __init__(self, id, name) -> None:
         self.id = id
         self.name = name
 
 
-class Scene(SceneBase):
+class SceneDto(SceneBaseDto):
     def __init__(self, id, name) -> None:
         super().__init__(id, name)
         self.subscenes = []
 
 
-class SubScene(SceneBase):
+class SubSceneDto(SceneBaseDto):
     def __init__(self, id, name) -> None:
         super().__init__(id, name)
