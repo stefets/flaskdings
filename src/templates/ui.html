@@ -174,7 +174,7 @@
                     button_class += "btn-dark'";
 
                 content += "<div class='col-md-6'>";
-                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "<input class=" + button_class + " type='button' id='" + scene.id.toString() + "' value='" + scene.name + "'>";
                 content += "</div>";
 
                 count++;
@@ -208,7 +208,7 @@
                     button_class += "btn-secondary'";
 
                 content += "<div class='col-md-3'>";
-                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "<input class=" + button_class + " type='button' id='" + scene.id.toString() + "' value='" + scene.name + "'>";
                 content += "</div>";
 
                 count++;
@@ -221,12 +221,12 @@
 
         // Direct scene navigation delegate
         $("#scenes").on("click", ".switch_scene", function (event) {
-            socket.emit('mididings', { command: 'switch_scene', id: $(this).attr('name') });
+            socket.emit('mididings', { command: 'switch_scene', id: $(this).attr('id') });
         });
 
         // Direct sub-scene navigation delegate
         $("#subscenes").on("click", ".switch_subscene", function (event) {
-            socket.emit('mididings', { command: 'switch_subscene', id: $(this).attr('name') });
+            socket.emit('mididings', { command: 'switch_subscene', id: $(this).attr('id') });
         });
 
         $('#next_scene').on("click", function (event) {
