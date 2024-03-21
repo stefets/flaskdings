@@ -113,7 +113,7 @@
 {% block websockets %}
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function () {
+    $(function () {
 
         var socket = io()
         var mainSocket = io("/main")
@@ -174,7 +174,7 @@
                     button_class += "btn-dark'";
 
                 content += "<div class='col-md-6'>";
-                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "<input class=" + button_class + " type='button' id='" + scene.id.toString() + "' value='" + scene.name + "'>";
                 content += "</div>";
 
                 count++;
@@ -208,7 +208,7 @@
                     button_class += "btn-secondary'";
 
                 content += "<div class='col-md-3'>";
-                content += "<input class=" + button_class + " type='button' name='" + scene.id.toString() + "' value='" + scene.name + "'>";
+                content += "<input class=" + button_class + " type='button' id='" + scene.id.toString() + "' value='" + scene.name + "'>";
                 content += "</div>";
 
                 count++;
@@ -219,45 +219,45 @@
             $('#subscenes').append(content);
         });
 
-        // Scene navigation delegate
-        $("#scenes").delegate("input.switch_scene", "click", function (event) {
-            socket.emit('mididings', { command: 'switch_scene', id: $(this).attr('name') });
+        // Direct scene navigation delegate
+        $("#scenes").on("click", ".switch_scene", function (event) {
+            socket.emit('mididings', { command: 'switch_scene', id: $(this).attr('id') });
         });
 
-        // Sub-Scene navigation delegate
-        $("#subscenes").delegate("input.switch_subscene", "click", function (event) {
-            socket.emit('mididings', { command: 'switch_subscene', id: $(this).attr('name') });
+        // Direct sub-scene navigation delegate
+        $("#subscenes").on("click", ".switch_subscene", function (event) {
+            socket.emit('mididings', { command: 'switch_subscene', id: $(this).attr('id') });
         });
 
-        $('#next_scene').click(function (event) {
+        $('#next_scene').on("click", function (event) {
             socket.emit('mididings', { command: 'next_scene' });
         });
 
-        $('#prev_scene').click(function (event) {
+        $('#prev_scene').on("click", function (event) {
             socket.emit('mididings', { command: 'prev_scene' });
         });
 
-        $('#next_subscene').click(function (event) {
+        $('#next_subscene').on("click", function (event) {
             socket.emit('mididings', { command: 'next_subscene' });
         });
 
-        $('#prev_subscene').click(function (event) {
+        $('#prev_subscene').on("click", function (event) {
             socket.emit('mididings', { command: 'prev_subscene' });
         });
 
-        $('#restart').click(function (event) {
+        $('#restart').on("click", function (event) {
             socket.emit('mididings', { command: 'restart' });
         });
 
-        $('#panic').click(function (event) {
+        $('#panic').on("click", function (event) {
             socket.emit('mididings', { command: 'panic' });
         });
 
-        $('#query').click(function (event) {
+        $('#query').on("click", function (event) {
             socket.emit('mididings', { command: 'query' });
         });
 
-        $('#quit').click(function (event) {
+        $('#quit').on("click", function (event) {
             socket.emit('mididings', { command: 'quit' });
             mainSocket.emit('action', { command: 'quit' });
         });
