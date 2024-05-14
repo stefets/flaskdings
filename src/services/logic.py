@@ -8,14 +8,14 @@
 '''
 
 
-from .osc import OscService
-from .scene import SceneService
+from .osc import OscLogic
+from .scene import SceneLogic
 
 
 class LogicService:
     def __init__(self, config) -> None:
-        self.scene_context = SceneService()
-        self.osc_context = OscService(config, self.scene_context)
+        self.scene_context = SceneLogic()
+        self.osc_context = OscLogic(config, self.scene_context)
 
     def is_dirty(self):
         return self.osc_context.dirty

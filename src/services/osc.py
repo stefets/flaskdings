@@ -12,7 +12,7 @@ import liblo
 from mididings.live.osc_control import LiveOSC
 
 
-class OscService:
+class OscLogic:
     def __init__(self, config, scene_context):
 
         self.server = LiveOSC(
