@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 '''
-    OSC context
+    OSC service
 '''
 
 
@@ -12,10 +12,10 @@ import liblo
 from mididings.live.osc_control import LiveOSC
 
 
-class OscContext:
+class OscLogic:
     def __init__(self, config, scene_context):
 
-        self.osc = LiveOSC(
+        self.server = LiveOSC(
             self, config["control_port"], config["listen_port"])
 
         self.dirty = False
@@ -23,8 +23,8 @@ class OscContext:
 
         self.scene_context = scene_context
 
-        self.osc.start()
-        self.osc.query()
+        self.server.start()
+        self.server.query()
 
     ''' LiveOSC callbacks '''
 

@@ -5,11 +5,11 @@
 
 
 '''
-    Scene context
+    Scene logic
 '''
 
 
-class SceneContext:
+class SceneLogic:
     def __init__(self) -> None:
         self.data_offset = -1
         self.scenes = []

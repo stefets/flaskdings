@@ -11,7 +11,7 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from logic.conductor import ContextManager
+from services.logic import LogicService
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -37,9 +37,9 @@ thread_lock = Lock()
 
 
 ''' Mididings and OSC context '''
-appContext = None
+logic = None
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    appContext = ContextManager(
+    logic = LogicService(
         configuration["osc_server"])
 
 
@@ -53,7 +53,7 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 def index():
     return \
     render_template('index.html') if request.endpoint == "home" else \
-    render_template('ui.html') if appContext.scene_context.scenes else render_template('no_context.html')
+    render_template('ui.html') if logic.scene_context.scenes else render_template('no_context.html')
 
 
 @app.get("/quit", endpoint="quit")
@@ -95,9 +95,9 @@ def on_quit():
     socketio.emit("on_terminate")
 
 def mididings_context_update():
-    appContext.set_dirty(False)
+    logic.set_dirty(False)
     socketio.emit('mididings_context_update',
-                  appContext.scene_context.payload)
+                  logic.scene_context.payload)
 
 
 def get_mididings_context():
@@ -106,9 +106,9 @@ def get_mididings_context():
 
 def osc_observer_thread():
     while True:
-        if appContext.is_dirty():
+        if logic.is_dirty():
             mididings_context_update()
-        socketio.emit("on_start") if appContext.is_running(
+        socketio.emit("on_start") if logic.is_running(
         ) else socketio.emit("on_exit")
         socketio.sleep(0.125)
 
@@ -117,16 +117,16 @@ def osc_observer_thread():
 Dict of methods
 '''
 delegates = {
-    "quit" : appContext.quit,
-    "panic" : appContext.panic,
-    "query" : appContext.query,
-    "restart" : appContext.restart,
-    "next_scene" : appContext.next_scene,
-    "prev_scene" : appContext.prev_scene,
-    "switch_scene" : appContext.switch_scene,
-    "next_subscene" : appContext.next_subscene,
-    "prev_subscene" : appContext.prev_subscene,
-    "switch_subscene" : appContext.switch_subscene,
+    "quit" : logic.quit,
+    "panic" : logic.panic,
+    "query" : logic.query,
+    "restart" : logic.restart,
+    "next_scene" : logic.next_scene,
+    "prev_scene" : logic.prev_scene,
+    "switch_scene" : logic.switch_scene,
+    "next_subscene" : logic.next_subscene,
+    "prev_subscene" : logic.prev_subscene,
+    "switch_subscene" : logic.switch_subscene,
     "get_mididings_context" : get_mididings_context,
     "mididings_context_update" : mididings_context_update
 }
