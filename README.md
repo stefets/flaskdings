@@ -10,7 +10,7 @@
 * Expose standard REST endpoints
 
 # REST API specification
-* It allows direct navigation through scenes and subscenes with REST API calls
+* It allows direct navigation through scenes and subscenes with REST API calls. Convenient to create your own UI
 <img src="/assets/restapi.png" />
 
 # Dependencies
