@@ -87,7 +87,7 @@ def on_command():
 @app.get("/api/next_scene", endpoint="next_scene")
 @app.get("/api/next_subscene", endpoint="next_subscene")
 @app.get("/api/prev_subscene", endpoint="prev_subscene")
-def on_switch_scene_subscene():
+def on_navigate():
     """
     Execute navigation endpoint
     ---
@@ -102,7 +102,7 @@ def on_switch_scene_subscene():
 
 @app.get("/api/switch_scene/<int:id>", endpoint="switch_scene")
 @app.get("/api/switch_subscene/<int:id>", endpoint="switch_subscene")
-def on_get_with_id(id):
+def on_navigate_by_id(id):
     """
     Switch to a specific [sub]scene
     ---
