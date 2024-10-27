@@ -58,7 +58,7 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 '''
 
 
-@app.route("/", endpoint="home")
+@app.get("/", endpoint="home")
 @app.get("/ui/", endpoint="view")
 def index():
     return \
