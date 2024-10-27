@@ -30,3 +30,7 @@ For more details, please read the LICENSE file.
 * https://www.github.com/mididings/mididings
 * https://mididings.github.io/mididings/
 * https://groups.google.com/g/mididings
+
+# REST API specification
+* It allows direct navigation through scenes and subscenes with REST API calls
+<img src="/assets/restapi.png" />

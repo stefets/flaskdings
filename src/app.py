@@ -12,8 +12,18 @@ from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
 from services.logic import LogicService
+from flasgger import Swagger
 
 app = Flask(__name__, static_url_path='/static')
+app.config['SWAGGER'] = {
+    "swagger": "2.0",
+    'title': 'FlaskDings API',
+    'uiversion': 3,
+    'description' : 'The mididings REST API specifications',
+    'termsOfService': "",
+    "version": "1.0.0",
+}
+swagger = Swagger(app)
 
 if not app.debug:
     import eventlet
@@ -48,7 +58,7 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 '''
 
 
-@app.get("/", endpoint="home")
+@app.route("/", endpoint="home")
 @app.get("/ui/", endpoint="view")
 def index():
     return \
@@ -56,19 +66,60 @@ def index():
     render_template('ui.html') if logic.scene_context.scenes else render_template('no_context.html')
 
 
-@app.get("/quit", endpoint="quit")
-@app.get("/panic", endpoint="panic")
-@app.get("/restart", endpoint="restart")
-@app.get("/prev_scene", endpoint="prev_scene")
-@app.get("/next_scene", endpoint="next_scene")
-@app.get("/next_subscene", endpoint="next_subscene")
-@app.get("/prev_subscene", endpoint="prev_subscene")
-@app.get("/switch_scene/<int:id>", endpoint="switch_scene")
-@app.get("/switch_subscene/<int:id>", endpoint="switch_subscene")
-def on_navigate(id=None):
-    delegates[request.endpoint]() if id is None else delegates[request.endpoint](int(id))
+@app.get("/api/quit", endpoint="quit")
+@app.get("/api/panic", endpoint="panic")
+@app.get("/api/restart", endpoint="restart")
+@app.get("/api/query", endpoint="query")
+def on_command():
+    """
+    Execute command endpoint
+    ---
+    tags:
+      - Options    
+    responses:
+      204:
+        description: No content
+    """
+    delegates[request.endpoint]()
     return '', 204
 
+@app.get("/api/prev_scene", endpoint="prev_scene")
+@app.get("/api/next_scene", endpoint="next_scene")
+@app.get("/api/next_subscene", endpoint="next_subscene")
+@app.get("/api/prev_subscene", endpoint="prev_subscene")
+def on_switch_scene_subscene():
+    """
+    Execute navigation endpoint
+    ---
+    tags:
+      - Navigation
+    responses:
+      204:
+        description: No content
+    """
+    delegates[request.endpoint]()
+    return '', 204
+
+@app.get("/api/switch_scene/<int:id>", endpoint="switch_scene")
+@app.get("/api/switch_subscene/<int:id>", endpoint="switch_subscene")
+def on_get_with_id(id):
+    """
+    Switch to a specific [sub]scene
+    ---
+    tags:
+      - Navigation
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: The ID of the [sub]scene to switch to
+    responses:
+      204:
+        description: No content
+    """
+    delegates[request.endpoint](int(id))
+    return '', 204
 
 ''' SocketIO events '''
 
