@@ -1,7 +1,6 @@
 # FlaskDings
 ## An UI and API for mididings, the community version
 * It allows direct navigation through scenes and subscenes and the others commands supported by the mididings's OSC feature
-<img src="/assets/flaskdings-20240226.png" />
 
 # Backend
 * Flask
@@ -11,7 +10,6 @@
 
 # REST API specification
 * It allows direct navigation through scenes and subscenes with REST API calls. Convenient to create your own UI
-<img src="/assets/restapi.png" />
 
 # Dependencies
 * mididings community version >= 20230114 (For previous version, use the Flaskdings TAG mididings-legacy)
