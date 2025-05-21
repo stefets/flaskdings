@@ -1,3 +1,40 @@
+![Status: Archived](https://img.shields.io/badge/status-archived-lightgrey)
+[![New Project: stagedings](https://img.shields.io/badge/new%20project-stagedings-blue)](https://github.com/stefets/stagedings)
+
+# ⚠️ Flaskdings (Archived)
+
+**Flaskdings** is now **archived** and no longer maintained.
+
+---
+
+### 📦 New Project: [stagedings](https://github.com/stefets/stagedings)
+
+Flaskdings has been refactored, renamed, and rebuilt using **FastAPI** under a new project: **stagedings**.
+
+👉 Please use [stagedings](https://github.com/stefets/stagedings) for all future development, bug reports, and feature requests.
+
+---
+
+### 📚 Historical Context
+
+Flaskdings was my original backend for scene and subscene navigation in **mididings**. It served as a simple, effective API built with Flask.
+
+We’ve since transitioned to **stagedings**, offering:
+- A modern async backend (FastAPI)
+- An UI for scene and subscene navigation
+- Improved WebSocket support
+- Future-ready design and modularity
+- Active development and support
+
+---
+
+### 🪦 Status
+
+This repository is archived and read-only. No further updates will be made here.
+
+
+---
+
 # FlaskDings
 ## An UI and API for mididings, the community version
 * It allows direct navigation through scenes and subscenes and the others commands supported by the mididings's OSC feature
