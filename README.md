@@ -1,39 +1,20 @@
+# ⚠️ Flaskdings (Archived)
+
 ![Status: Archived](https://img.shields.io/badge/status-archived-lightgrey)
 [![New Project: stagedings](https://img.shields.io/badge/new%20project-stagedings-blue)](https://github.com/stefets/stagedings)
 
-# ⚠️ Flaskdings (Archived)
-
-**Flaskdings** is now **archived** and no longer maintained.
-
----
-
-### 📦 New Project: [stagedings](https://github.com/stefets/stagedings)
-
-Flaskdings has been refactored, renamed, and rebuilt using **FastAPI** under a new project: **stagedings**.
-
-👉 Please use [stagedings](https://github.com/stefets/stagedings) for all future development, bug reports, and feature requests.
+> ⚠️ **This project is archived and no longer maintained.**  
+> It has been succeeded by **[stagedings](https://github.com/stefets/stagedings)** — actively developed and built with FastAPI, WebSockets, and modern UI support.
 
 ---
 
-### 📚 Historical Context
+<details>
+<summary>📖 View the original Flaskdings README</summary>
 
-Flaskdings was my original backend for scene and subscene navigation in **mididings**. It served as a simple, effective API built with Flask.
+## Introduction
 
-We’ve since transitioned to **stagedings**, offering:
-- A modern async backend (FastAPI)
-- An UI for scene and subscene navigation
-- Improved WebSocket support
-- Future-ready design and modularity
-- Active development and support
-
----
-
-### 🪦 Status
-
-This repository is archived and read-only. No further updates will be made here.
-
-
----
+Flaskdings is a lightweight Python Flask web interface and REST API that interacts with the [mididings](https://github.com/mididings/mididings) MIDI router.  
+It enables scene and subscene navigation via a web UI or API.
 
 # FlaskDings
 ## An UI and API for mididings, the community version
@@ -70,3 +51,4 @@ General Public License as published by the Free Software Foundation;
 either version 2 of the License, or (at your option) any later version.
 
 For more details, please read the LICENSE file.
+</details>
